@@ -1,7 +1,7 @@
-import { Button } from '@nextui-org/react'
-import { useContext, useEffect, useState } from 'react'
+import { Button, Spinner } from '@nextui-org/react'
+import { Suspense, useContext, useEffect, useState } from 'react'
 import { createBrowserRouter, RouterProvider, useNavigate, useParams } from 'react-router-dom'
-import { router } from './router'
+import { authRouter, router } from './router'
 import { UserInfoContext } from './context/UserInfoContext'
 import { UserInfo } from './types'
 import { get } from './common/request'
@@ -10,8 +10,10 @@ import { getUserInfo } from './api'
 
 function App() {
   const [userInfo, setUserInfo] = useState<UserInfo>({} as UserInfo)
+  const [isLoading, setIsLoading] = useState(true)
   const init = async () => {
     try {
+      setIsLoading(true)
       const res = await getUserInfo()
       setUserInfo({ ...res.data, hasLogin: true })
       console.log('res', res);
@@ -22,22 +24,27 @@ function App() {
       console.log(msg);
       location.replace('/login')
     }
-
+    setIsLoading(false)
   }
   useEffect(() => {
-    if (userInfo.hasLogin || /\/login$/.test(window.location.pathname)) return
+    if (userInfo.hasLogin || /\/login$/.test(window.location.pathname)) {
+      setIsLoading(false)
+      return
+    }
     init()
   }, [])
 
   return (
-    <>
-      <UserInfoContext.Provider value={{ ...userInfo, setUserInfoContext: setUserInfo }}>
+    <>{
+      isLoading ? <Spinner></Spinner> : (
+        <UserInfoContext.Provider value={{ userInfo, setUserInfoContext: setUserInfo }}>
+          <RouterProvider
+            router={createBrowserRouter(authRouter(userInfo.uGroup ?? []))}>
+          </RouterProvider>
 
-        <RouterProvider router={createBrowserRouter(router)}>
-
-        </RouterProvider>
-
-      </UserInfoContext.Provider >
+        </UserInfoContext.Provider >
+      )
+    }
     </>
   )
 }

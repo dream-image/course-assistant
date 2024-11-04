@@ -3,8 +3,8 @@ import welcome from '@/assets/欢迎.svg'
 import { Button, Image, Input, Link } from '@nextui-org/react'
 import { useNavigate } from 'react-router-dom'
 import Background from '@/assets/背景图.jpg'
-import { useContext, useRef, useState } from 'react'
-import { login } from '@/api'
+import { useContext, useEffect, useRef, useState } from 'react'
+import { getUserInfo, login } from '@/api'
 import { message } from 'antd'
 import { LoginInfo } from '@/api/type'
 import { setToken } from '@/utils'
@@ -12,7 +12,7 @@ import { UserInfo } from '@/types'
 import { UserInfoContext } from '@/context/UserInfoContext'
 import styles from './style.module.css'
 const Login = () => {
-  const { setUserInfoContext } = useContext(UserInfoContext)
+  const { setUserInfoContext, } = useContext(UserInfoContext)
   const [loginInfo, setLoginInfo] = useState<LoginInfo>()
   const [userInfo, setUserInfo] = useState<UserInfo>()
   const passwordRef = useRef<HTMLInputElement>(null)
@@ -28,12 +28,16 @@ const Login = () => {
       setUserInfoContext({ ...res.data?.data?.userInfo, hasLogin: true })
       setToken(res.headers['authorization'])
       message.success('登录成功')
-      navigate('/home')
+      console.log('res', res.data);
+
+      navigate('/ai')
     } catch (error: any) {
       const msg = error.error_msg || error.message
       console.log(msg)
     }
   }
+
+
   return (
     <div className='grid grid-cols-2 h-screen min-w-[800px] animate-opacity'>
       <div className=' w-full   flex flex-col  items-center '>

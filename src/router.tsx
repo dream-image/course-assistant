@@ -1,35 +1,53 @@
-import { RouteObject } from "react-router-dom"
+import { Navigate, RouteObject } from "react-router-dom"
 import NotFound from "@/pages/NotFound";
 import Login from "./pages/Login";
-import ChartAI from "./pages/ChartAI";
+import ChatAI from "./pages/ChatAI";
 import Lesson from "./pages/Lesson";
 import Manage from "./pages/Manage";
+import Home from "./pages/Home";
 
 export const router: RouteObject[] = [
   {
-    path: "/",
-    loader: () => {
-      return { redirect: "/home" }
-    }
+    path: 'chatai',
+    element: <ChatAI />
   },
   {
-    path: "/login",
-    element: <Login />,
-  },
-  {
-    path: '/chartai',
-    element: <ChartAI />
-  },
-  {
-    path: '/lesson',
+    path: 'lesson',
     element: <Lesson />
   },
   {
-    path: '/manage',
+    path: 'manage',
     element: <Manage />
   },
-  {
-    path: "/*",
-    element: <NotFound />,
-  },
+
 ]
+
+export const authRouter = (uGroup: string[]): RouteObject[] => {
+
+
+  const baseRouter: RouteObject[] = [
+    {
+      path: "/login",
+      element: <Login />,
+    },
+    {
+      path: '/ai',
+      element: <Home />,
+      children: router.filter(i => {
+        return uGroup.map(i => i.toLocaleUpperCase()).includes(i.path!.toLocaleUpperCase())
+      })
+    },
+    {
+      path: "/",
+      element: <Navigate to={'/ai'} replace />
+    },
+    {
+      path: "/*",
+      element: <NotFound />,
+    },
+  ]
+
+  return baseRouter
+
+
+}
