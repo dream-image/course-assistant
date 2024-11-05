@@ -3,5 +3,6 @@ export type UserInfo = {
     uGroup:string[];
     username:string;
     nickname:string;
+    role:string;
     userid:string;
 }
