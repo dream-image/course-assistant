@@ -22,7 +22,6 @@ export default {
     fontFamily: {
       'song': ['宋体'],
       'kai': ['华文行楷'],
-
     }
   },
   plugins: [nextui(

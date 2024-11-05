@@ -22,7 +22,10 @@ function App() {
     } catch (error: any) {
       const msg = error?.error_msg || error?.message
       console.log(msg);
-      location.replace('/login')
+      setTimeout(() => {
+        location.replace('/login')
+      }, 1000);
+
     }
     setIsLoading(false)
   }
@@ -37,7 +40,11 @@ function App() {
   return (
     <>{
       isLoading ? <Spinner></Spinner> : (
-        <UserInfoContext.Provider value={{ userInfo, setUserInfoContext: setUserInfo }}>
+        <UserInfoContext.Provider value={{
+          userInfo, setUserInfoContext: (props) => {
+            setUserInfo(props)
+          }
+        }}>
           <RouterProvider
             router={createBrowserRouter(authRouter(userInfo.uGroup ?? []))}>
           </RouterProvider>

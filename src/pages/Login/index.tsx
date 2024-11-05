@@ -24,8 +24,9 @@ const Login = () => {
         return
       }
       const res = await login(loginInfo)
-      setUserInfo({ ...res.data?.data?.userInfo, hasLogin: true })
-      setUserInfoContext({ ...res.data?.data?.userInfo, hasLogin: true })
+
+      setUserInfo({ ...res.data?.data, hasLogin: true })
+      setUserInfoContext({ ...res.data?.data, hasLogin: true })
       setToken(res.headers['authorization'])
       message.success('登录成功')
       console.log('res', res.data);

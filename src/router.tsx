@@ -27,6 +27,10 @@ export const authRouter = (uGroup: string[]): RouteObject[] => {
 
   const baseRouter: RouteObject[] = [
     {
+      path: "/",
+      element: <Navigate to={'/ai'} replace />
+    },
+    {
       path: "/login",
       element: <Login />,
     },
@@ -36,10 +40,6 @@ export const authRouter = (uGroup: string[]): RouteObject[] => {
       children: router.filter(i => {
         return uGroup.map(i => i.toLocaleUpperCase()).includes(i.path!.toLocaleUpperCase())
       })
-    },
-    {
-      path: "/",
-      element: <Navigate to={'/ai'} replace />
     },
     {
       path: "/*",
