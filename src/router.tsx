@@ -5,6 +5,7 @@ import ChatAI from "./pages/ChatAI";
 import Lesson from "./pages/Lesson";
 import Manage from "./pages/Manage";
 import Home from "./pages/Home";
+import Info from "./pages/Info";
 
 export const router: RouteObject[] = [
   {
@@ -39,7 +40,12 @@ export const authRouter = (uGroup: string[]): RouteObject[] => {
       element: <Home />,
       children: router.filter(i => {
         return uGroup.map(i => i.toLocaleUpperCase()).includes(i.path!.toLocaleUpperCase())
-      })
+      }).concat([
+        {
+          path: "info",
+          element: <Info />,
+        },
+      ])
     },
     {
       path: "/*",

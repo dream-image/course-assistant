@@ -11,11 +11,22 @@ export default {
     extend: {
       animation: {
         'opacity': 'opacity 1s ease-in-out',
+        'bgColor':' bgColor 0.5s ease-in-out forwards',
       },
       keyframes:{
         'opacity':{
           '0%': {opacity: 0},
           '100%': {opacity: 1},
+        },
+        'bgColor':{
+          '0%':{
+            backgroundColor: 'rgba(0,0,0,0)',
+            boxShadow: '0 0 0 0 rgba(0,0,0,0)',
+          },
+          '100%':{
+            backgroundColor: '#eef2ff',
+            boxShadow: '0 0 8px 0.3px rgba(0,0,0,0.1)',
+          }
         }
       }
     },

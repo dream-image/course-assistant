@@ -1,4 +1,4 @@
-import { Avatar, Button, Chip, Dropdown, DropdownTrigger, Image, Popover, PopoverContent, PopoverTrigger } from '@nextui-org/react'
+import { Avatar, Button, Chip, Divider, Dropdown, DropdownTrigger, Image, Popover, PopoverContent, PopoverTrigger } from '@nextui-org/react'
 import { Outlet, useNavigate } from 'react-router-dom'
 import background from '@/assets/background.png'
 import Logo from '/public/logo.svg'
@@ -58,13 +58,13 @@ const AvatarInfo = (props: { userInfo: UserInfo, hasIcon?: boolean, widthFlex?: 
 const nav = [
   {
     name: '课程中心',
-    key: ['student'],
+    key: ['all'],
     path: 'lesson'
   },
   {
     name: '个人主页',
-    key: ['student'],
-    path: 'lesson'
+    key: ['all'],
+    path: 'info'
   }
 ]
 const Home = () => {
@@ -81,10 +81,12 @@ const Home = () => {
             <span className='font-semibold font-kai text-2xl text-gray-700'>天书</span>
           </div>
           <div className='flex-1 ml-8 flex items-center'>
+            
             {
-              nav.filter((item => item.key.includes(userInfo?.role || ''))).map((item) => {
-                return <div className=' '>
-                  <Button key={item.name} className='border-l-1' radius='none' variant="light" onClick={() => {
+              nav.filter((item => item.key.includes('all') || item.key.includes(userInfo?.role))).map((item) => {
+                return <div className='flex h-[40px]' key={item.name}>
+                  <Divider className=" h-full"  orientation="vertical" />
+                  <Button className='' radius='none' variant="light" onClick={() => {
                     navigate(item.path)
                   }}>{item.name}</Button>
                 </div>
@@ -122,7 +124,13 @@ const Home = () => {
 
         </div>
       </div>
-      <Outlet ></Outlet>
+      <div className='absolute flex justify-center top-[76px]' style={{
+        height: `calc(100vh - 76px)`,
+        width: '100vw',
+      }}>
+        <Outlet ></Outlet>
+      </div>
+
     </div>
   )
 };
