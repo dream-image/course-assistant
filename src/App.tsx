@@ -5,7 +5,9 @@ import { authRouter, router } from './router'
 import { UserInfoContext } from './context/UserInfoContext'
 import { UserInfo } from './types'
 import { get } from './common/request'
-import { getUserInfo } from './api'
+import { getUserInfo, refreshToken } from './api'
+import { autoRefreshToken } from './utils/autoRefreshToken'
+import { message } from 'antd'
 
 
 function App() {
@@ -18,14 +20,14 @@ function App() {
       setUserInfo({ ...res.data, hasLogin: true })
       console.log('res', res);
       console.log('已登录');
-
+      autoRefreshToken()
     } catch (error: any) {
       const msg = error?.error_msg || error?.message
       console.log(msg);
+      message.error({ content: msg })
       setTimeout(() => {
         location.replace('/login')
       }, 1000);
-
     }
     setIsLoading(false)
   }

@@ -11,6 +11,7 @@ import { setToken } from '@/utils'
 import { UserInfo } from '@/types'
 import { UserInfoContext } from '@/context/UserInfoContext'
 import styles from './style.module.css'
+import { autoRefreshToken } from '@/utils/autoRefreshToken'
 const Login = () => {
   const { setUserInfoContext, } = useContext(UserInfoContext)
   const [loginInfo, setLoginInfo] = useState<LoginInfo>()
@@ -28,6 +29,7 @@ const Login = () => {
       setUserInfo({ ...res.data?.data, hasLogin: true })
       setUserInfoContext({ ...res.data?.data, hasLogin: true })
       setToken(res.headers['authorization'])
+      autoRefreshToken()
       message.success('登录成功')
       console.log('res', res.data);
 

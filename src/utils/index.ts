@@ -1,3 +1,4 @@
+import { refreshToken } from "@/api"
 import { UserInfoContext } from "@/context/UserInfoContext"
 import { useContext } from "react"
 
@@ -12,3 +13,4 @@ export const useUserInfo = () => {
     const userInfo = useContext(UserInfoContext)
     return userInfo
 }
+

@@ -81,11 +81,11 @@ const Home = () => {
             <span className='font-semibold font-kai text-2xl text-gray-700'>天书</span>
           </div>
           <div className='flex-1 ml-8 flex items-center'>
-            
+
             {
               nav.filter((item => item.key.includes('all') || item.key.includes(userInfo?.role))).map((item) => {
                 return <div className='flex h-[40px]' key={item.name}>
-                  <Divider className=" h-full"  orientation="vertical" />
+                  <Divider className=" h-full" orientation="vertical" />
                   <Button className='' radius='none' variant="light" onClick={() => {
                     navigate(item.path)
                   }}>{item.name}</Button>
@@ -106,6 +106,8 @@ const Home = () => {
                     <AvatarInfo userInfo={userInfo} hasIcon={false} widthFlex={false}></AvatarInfo>
                   </div>
                   <Button variant="flat" className='min-w-5 font-medium ml-2' onClick={() => {
+                    //@ts-expect-error
+                    window.refreshToken && clearTimeout(window.refreshToken)
                     setTimeout(() => {
                       setToken('')
                       navigate('/login')

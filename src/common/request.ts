@@ -31,8 +31,10 @@ request.interceptors.response.use(function (response) {
     return Promise.reject(error)
 })
 export const get = async <T>(url: string, params?: Record<string, any>): Promise<BaseResponse<T>> => {
+    
     const res = await request.get(url, { params })
     return res.data
+
 }
 export const post = async (url: string, data: Record<string, any>): Promise<BaseResponse<any>> => {
     const res = await request.post(url, data)

@@ -6,7 +6,7 @@ import { LoginInfo } from "./type";
 
 
 export const refreshToken = async () => {
-    return get("/token/refresh")
+    return get<{ availableTime: number }>("/token/refresh")
 }
 export const getUserInfo = async () => {
     return get<UserInfo>('/userInfo')
