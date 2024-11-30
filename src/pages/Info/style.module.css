@@ -1,0 +1,6 @@
+.progress {
+  div[class*="ant-progress-steps-item"] {
+    border-radius: 8px;
+  }
+
+}
