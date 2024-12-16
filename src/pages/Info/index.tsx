@@ -1,13 +1,13 @@
-import { Button, Card, CardBody, CardHeader, commonColors, Divider, Image, Input, Tab, Tabs } from '@nextui-org/react'
+import { Button, Card, CardBody, CardHeader, commonColors, Divider, Image, Tab, Tabs } from '@nextui-org/react'
 import { useContext, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom'
 import image from '@/assets/头像.png'
 import { FormControlRender, ProDescriptions, ProDescriptionsActionType } from '@ant-design/pro-components';
 import { UserInfoContext } from '@/context/UserInfoContext';
 import { post } from '@/common/request';
-import { ConfigProvider, Form, message, Progress } from 'antd';
+import { ConfigProvider, Form, Input, message, Progress } from 'antd';
 import { isEmpty, isMatch, isUndefined } from 'lodash-es';
-import { CameraOutlined } from '@ant-design/icons';
+import { CameraOutlined, CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
 import styles from './style.module.css'
 const Info = () => {
   const navigate = useNavigate()
@@ -15,12 +15,14 @@ const Info = () => {
   const [tabKey, setTabKey] = useState<string>('info')
   const actionRef = useRef<ProDescriptionsActionType>();
   const [percent, setPercent] = useState<number>(0)
-  const [form] = Form.useForm();
+  const [form] = Form.useForm()
   return (
     <div className=' w-[1680px] h-full flex ml-4 relative'>
       <div className='h-full mr-8 hover:bg-indigo-50 hover:shadow-sky-100 hover:shadow-md transition-all w-max rounded-xl'>
         <Tabs aria-label="Options" variant="light" isVertical={true} onSelectionChange={(e) => {
           setTabKey(e.toString())
+          setPercent(0)
+          form.resetFields()
         }}>
           <Tab key="info" title="基本资料">
 
@@ -58,7 +60,10 @@ const Info = () => {
                     return Promise.resolve({
                       success: true,
                       data: {
-                        info: userInfo
+                        info: {
+                          ...userInfo,
+                          sex: userInfo.sex?.toString()
+                        }
                       },
                     });
                   }}
@@ -72,10 +77,10 @@ const Info = () => {
                           message.error('昵称长度不得小于1大于20')
                           return false
                         }
-                        console.log(keypath, newInfo, oriInfo);
                         await post('/updateUserInfo', {
                           ...newInfo.info
                         })
+                        message.success('修改成功')
                         setUserInfoContext({ ...userInfo, ...newInfo.info })
                         return true;
                       } catch (error) {
@@ -93,7 +98,6 @@ const Info = () => {
                       rules: [
                         {
                           validator: (_, value) => {
-                            console.log('value', value);
 
                             if (value.length < 3) {
                               return Promise.reject('昵称长度不得小于3')
@@ -119,28 +123,24 @@ const Info = () => {
                     label="性别"
                     dataIndex={['info', 'sex']}
                     valueType="radio"
-                    renderText={(value) => {
-                      return value === 1 ? '男' : '女'
-                    }}
                     formItemProps={{
-                      initialValue: '男',
                       rules: [
                         {
                           validator(rule, value, callback) {
-                            console.log('value', value);
 
                             if (value === undefined) {
-                              callback('该项必填')
+                              return Promise.reject('该项必填')
                             } else {
-                              callback()
+                              return Promise.resolve()
                             }
                           },
                         }
                       ]
                     }}
+
                     valueEnum={{
-                      1: '男',
-                      0: '女',
+                      '1': '男',
+                      '0': '女',
                     }}
                   />
                   <ProDescriptions.Item
@@ -191,47 +191,65 @@ const Info = () => {
                     }
                     setPercent(score)
                   }
-                }}>
-                  <Form.Item rules={[
-                    {
-                      required: true,
-                      message: '该项必填'
-                    }
-                  ]} label="旧密码" name={'oldPassword'}>
-                    <Input type='password'></Input>
+                }}
+                  onFinish={(values) => {
+
+                  }}>
+                  <Form.Item
+                    rules={[
+                      {
+                        required: true,
+                        message: '该项必填'
+                      }
+                    ]}
+                    hasFeedback
+                    label="旧密码" name={'oldPassword'}>
+                    <Input.Password
+                      type='password'></Input.Password>
                   </Form.Item>
-                  <Form.Item rules={[
-                    {
-                      required: true,
-                      message: '该项必填'
-                    }
-                  ]} label="新密码" name={'newPassword'}>
+                  <Form.Item
+                    rules={[
+                      {
+                        validator(rule, value, callback) {
+                          if (percent < 100) {
+                            return Promise.reject('密码强度不够')
+                          }
+                          return Promise.resolve()
+                        },
+                      }
+                    ]}
+                    hasFeedback
+                    required label="新密码"
+                    name={'newPassword'}
+
+                  >
                     <FormControlRender>
                       {
                         (props) => {
-                          return <>
-                            <Input type="password" description={
-                              <>
-                                {
-                                  !!percent && <Progress
-                                    strokeLinecap='round'
-                                    percent={percent}
-                                    strokeColor={[commonColors.zinc[200], commonColors.zinc[300], commonColors.yellow[200], commonColors.yellow[300], commonColors.green[400]]}
-                                    steps={5}
-                                    className={styles.progress}
+                          return <div>
+                            <Input.Password
+                              {...props}
+                              //@ts-ignore
+                              status={props.status}></Input.Password>
+                            <div className='text-xs text-zinc-400'>
+                              {
+                                !!percent && <Progress
+                                  strokeLinecap='round'
+                                  percent={percent}
+                                  strokeColor={[commonColors.zinc[200], commonColors.zinc[300], commonColors.yellow[200], commonColors.yellow[300], commonColors.green[400]]}
+                                  steps={5}
+                                  className={styles.progress}
 
-                                    showInfo={false}
-                                    trailColor={commonColors.zinc[50]}
-                                    size={{
-                                      width: 35,
-                                      height: 5
-                                    }} />
-                                }
-                                密码要求8-16位，至少包含数字、大小写字母、字符
-                              </>
-                            } {...props}></Input>
-
-                          </>
+                                  showInfo={false}
+                                  trailColor={commonColors.zinc[50]}
+                                  size={{
+                                    width: 35,
+                                    height: 5
+                                  }} />
+                              }
+                              密码要求8-16位，至少包含数字、大小写字母、字符
+                            </div>
+                          </div>
                         }
                       }
                     </FormControlRender>
@@ -246,8 +264,9 @@ const Info = () => {
                       }
 
                     }
-                  ]} required label="确认新的密码" name={'confirmPassword'}>
-                    <Input type='password'></Input>
+                  ]} hasFeedback required label="确认新的密码" name={'confirmPassword'}>
+                    <Input.Password
+                    ></Input.Password>
                   </Form.Item>
                   <Form.Item wrapperCol={{ offset: 10 }}>
                     <Button color='primary' type="submit">
