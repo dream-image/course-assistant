@@ -76,7 +76,7 @@ const Login = () => {
             }}></Input>
           </div>
           <div className='w-full flex justify-between mt-2'>
-            <Link className='text-sm text-gray-500 hover:text-sky-600 hover:cursor-pointer'>注册</Link>
+            <Link className='text-sm text-sky-400 hover:text-sky-600 hover:cursor-pointer'>注册</Link>
             <Link className='text-sm text-gray-500 hover:text-sky-600 hover:cursor-pointer'>忘记密码？</Link>
           </div>
           <div className='mt-2'>

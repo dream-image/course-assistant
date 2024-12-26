@@ -62,8 +62,8 @@ const Lesson = () => {
 
         </Tabs>
       </div>
-      <div className='w-full flex justify-start'>
-        <Card className={`w-11/12 animate__animated  animate__fadeIn h-max`}>
+      <div className='w-full flex justify-start h-full'>
+        <Card className={`w-11/12 animate__animated  animate__fadeIn h-[95%] `}>
           {
             tabKey === 'center' && <>
               <CardHeader>
