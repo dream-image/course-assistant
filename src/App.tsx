@@ -1,7 +1,7 @@
 import { Button, Spinner } from '@nextui-org/react'
 import { Suspense, useContext, useEffect, useState } from 'react'
 import { createBrowserRouter, RouterProvider, useNavigate, useParams } from 'react-router-dom'
-import { authRouter, router } from './router'
+import { authRouter, NotAuthRouterList, router } from './router'
 import { UserInfoContext } from './context/UserInfoContext'
 import { UserInfo } from './types'
 import { get } from './common/request'
@@ -32,7 +32,7 @@ function App() {
     setIsLoading(false)
   }
   useEffect(() => {
-    if (userInfo.hasLogin || /\/login$/.test(window.location.pathname)) {
+    if (userInfo.hasLogin ||   NotAuthRouterList.some(i=> new RegExp(`/${i}$`).test(window.location.pathname))) {
       setIsLoading(false)
       return
     }

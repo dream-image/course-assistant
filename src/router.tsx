@@ -1,4 +1,4 @@
-import { Navigate, RouteObject } from "react-router-dom"
+import { Navigate, RouteObject } from "react-router-dom";
 import NotFound from "@/pages/NotFound";
 import Login from "./pages/Login";
 import ChatAI from "./pages/ChatAI";
@@ -6,54 +6,60 @@ import Lesson from "./pages/Lesson";
 import Manage from "./pages/Manage";
 import Home from "./pages/Home";
 import Info from "./pages/Info";
+import Register from "./pages/Register";
+
+export const NotAuthRouterList = ["register", "login"];
 
 export const router: RouteObject[] = [
   {
-    path: 'chatai',
-    element: <ChatAI />
+    path: "chatai",
+    element: <ChatAI />,
   },
   {
-    path: 'lesson',
-    element: <Lesson />
+    path: "lesson",
+    element: <Lesson />,
   },
   {
-    path: 'manage',
-    element: <Manage />
+    path: "manage",
+    element: <Manage />,
   },
-
-]
+];
 
 export const authRouter = (uGroup: string[]): RouteObject[] => {
-
-
   const baseRouter: RouteObject[] = [
     {
       path: "/",
-      element: <Navigate to={'/ai'} replace />
+      element: <Navigate to={"/ai"} replace />,
     },
     {
       path: "/login",
       element: <Login />,
     },
     {
-      path: '/ai',
+      path: "register",
+      element: <Register />,
+    },
+    {
+      path: "/ai",
       element: <Home />,
-      children: router.filter(i => {
-        return uGroup.map(i => i.toLocaleUpperCase()).includes(i.path!.toLocaleUpperCase())
-      }).concat([
-        {
-          path: "info",
-          element: <Info />,
-        },
-      ])
+      children: router
+        .filter((i) => {
+          return uGroup
+            .map((i) => i.toLocaleUpperCase())
+            .includes(i.path!.toLocaleUpperCase());
+        })
+        .concat([
+          {
+            path: "info",
+            element: <Info />,
+          },
+        ]),
     },
     {
       path: "/*",
       element: <NotFound />,
     },
-  ]
+  ];
 
-  return baseRouter
-
-
-}
+  return baseRouter;
+};

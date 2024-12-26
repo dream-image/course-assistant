@@ -13,6 +13,7 @@ import { UserInfoContext } from '@/context/UserInfoContext'
 import styles from './style.module.css'
 import { autoRefreshToken } from '@/utils/autoRefreshToken'
 const Login = () => {
+
   const { setUserInfoContext, } = useContext(UserInfoContext)
   const [loginInfo, setLoginInfo] = useState<LoginInfo>()
   const [userInfo, setUserInfo] = useState<UserInfo>()
@@ -76,8 +77,12 @@ const Login = () => {
             }}></Input>
           </div>
           <div className='w-full flex justify-between mt-2'>
-            <Link className='text-sm text-sky-400 hover:text-sky-600 hover:cursor-pointer'>注册</Link>
-            <Link className='text-sm text-gray-500 hover:text-sky-600 hover:cursor-pointer'>忘记密码？</Link>
+            <Link className='text-sm text-sky-400 hover:text-sky-600 hover:cursor-pointer' onClick={()=>{
+              navigate('/register')
+            }}>注册</Link>
+            <Link className='text-sm text-gray-500 hover:text-sky-600 hover:cursor-pointer' onClick={()=>{
+
+            }}>忘记密码？</Link>
           </div>
           <div className='mt-2'>
             <Button color='primary' className="bg-gradient-to-tr from-blue-200 to-sky-500 text-white shadow-lg w-full" onClick={() => {
