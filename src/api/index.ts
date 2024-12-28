@@ -1,6 +1,6 @@
 import request, { get, post } from "@/common/request"
 import { UserInfo } from "@/types"
-import { LoginInfo } from "./type";
+import { GetLessonListParams, LoginInfo } from "./type";
 
 
 
@@ -15,3 +15,6 @@ export const login = async (params: LoginInfo) => {
     return request.post("/login", params)
 }
 
+export const getLessonList = async (params: GetLessonListParams) => {
+    return get("/lesson/list", params)
+}

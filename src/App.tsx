@@ -1,11 +1,10 @@
-import { Button, Spinner } from '@nextui-org/react'
-import { Suspense, useContext, useEffect, useState } from 'react'
-import { createBrowserRouter, RouterProvider, useNavigate, useParams } from 'react-router-dom'
-import { authRouter, NotAuthRouterList, router } from './router'
+import {  Spinner } from '@nextui-org/react'
+import {  useEffect, useState } from 'react'
+import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import { authRouter, NotAuthRouterList } from './router'
 import { UserInfoContext } from './context/UserInfoContext'
 import { UserInfo } from './types'
-import { get } from './common/request'
-import { getUserInfo, refreshToken } from './api'
+import { getUserInfo } from './api'
 import { autoRefreshToken } from './utils/autoRefreshToken'
 import { message } from 'antd'
 
@@ -18,11 +17,10 @@ function App() {
       setIsLoading(true)
       const res = await getUserInfo()
       setUserInfo({ ...res.data, hasLogin: true })
-      console.log('res', res);
       console.log('已登录');
       autoRefreshToken()
     } catch (error: any) {
-      const msg = error?.error_msg || error?.message
+      const msg = error?.error_msg || error?.message||error
       console.log(msg);
       message.error({ content: msg })
       setTimeout(() => {
@@ -32,7 +30,7 @@ function App() {
     setIsLoading(false)
   }
   useEffect(() => {
-    if (userInfo.hasLogin ||   NotAuthRouterList.some(i=> new RegExp(`/${i}$`).test(window.location.pathname))) {
+    if (userInfo.hasLogin || NotAuthRouterList.some(i => new RegExp(`/${i}$`).test(window.location.pathname))) {
       setIsLoading(false)
       return
     }

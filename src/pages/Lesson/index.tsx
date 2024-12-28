@@ -1,7 +1,8 @@
+import { getLessonList } from '@/api';
 import Logo from '@/assets/404.svg'
 import { DashOutlined, EllipsisOutlined, SearchOutlined } from '@ant-design/icons';
 import { Button, Card, CardBody, CardFooter, CardHeader, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Image, Input, Tab, Tabs } from '@nextui-org/react'
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom'
 
 const LessonCard = () => {
@@ -47,18 +48,28 @@ const LessonCard = () => {
 const Lesson = () => {
   const navigate = useNavigate()
   const [tabKey, setTabKey] = useState<string>('center')
+  const [searchConfig, setSearchConfig] = useState({
+    limit: 20,
+    offset: 0
+  })
+  useEffect(() => {
+    if (tabKey === 'center') {
+      getLessonList(searchConfig)
+    }
+  }, [tabKey])
+
   return (
     <div className=' w-[1680px] h-full flex ml-4 relative'>
       <div className='h-full mr-8 hover:bg-indigo-50 hover:shadow-sky-100 hover:shadow-md transition-all w-max rounded-xl'>
         <Tabs aria-label="Options" variant="light" isVertical={true} onSelectionChange={(e) => {
           setTabKey(e.toString())
         }}>
-          <Tab key="center" title="我学的课">
+          <Tab key="center" title="我的课程">
 
           </Tab>
-          <Tab key="myLesson" title="我教的课">
+          {/* <Tab key="myLesson" title="我教的课">
 
-          </Tab>
+          </Tab> */}
 
         </Tabs>
       </div>
@@ -68,7 +79,7 @@ const Lesson = () => {
             tabKey === 'center' && <>
               <CardHeader>
                 <div className='flex flex-row justify-between w-full items-center'>
-                  <span className='text-xl flex-1'>我学的课</span>
+                  <span className='text-xl flex-1'>我的课程</span>
                   <Input
                     autoComplete="on"
                     isClearable
