@@ -3,18 +3,22 @@ export type LoginInfo = {
     password?: string
 }
 
-export interface GetLessonListParams{
-    limit:number;
-    offset:number;
+export interface GetLessonListParams {
+    limit: number;
+    offset: number;
 
 }
-export interface GetLessonListResponse{
-   
-    data:{
-        total:number;
-        lessonList:{
-            
-        }[]
+export type LessonType = {
+    id: number;
+    name: string;
+    createTime: string;
+    ownerId: number;
+}
+export interface GetLessonListResponse {
+
+    data: {
+        total: number;
+        lessonList: LessonType[]
     }
 
 

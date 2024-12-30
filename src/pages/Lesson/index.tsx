@@ -1,15 +1,18 @@
 import { getLessonList } from '@/api';
+import { LessonType } from '@/api/type';
 import Logo from '@/assets/404.svg'
 import { DashOutlined, EllipsisOutlined, SearchOutlined } from '@ant-design/icons';
 import { Button, Card, CardBody, CardFooter, CardHeader, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Image, Input, Tab, Tabs } from '@nextui-org/react'
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom'
 
-const LessonCard = () => {
+
+const LessonCard = (props: LessonType) => {
+  const { name } = props
   return (
     <Card isFooterBlurred className="border-none relative w-[200px] h-[200px] hover:scale-105" radius="lg">
       <Image
-        alt="计算机科学与技术"
+        alt={name}
         className=" bg-contain"
         height={200}
         src="/public/defaultBg_LE_upscale_balanced_x4_light_ai_30.jpg"
@@ -30,7 +33,7 @@ const LessonCard = () => {
         </Dropdown>
       </div>
       <CardFooter className="justify-between before:bg-white/10 border-white/20 border-1 overflow-hidden py-1 absolute before:rounded-xl rounded-large bottom-1 w-[calc(100%_-_8px)] shadow-small ml-1 z-10">
-        <p className="text-tiny text-white/80">计算机科学与技术</p>
+        <p className="text-tiny text-white/80">{name}</p>
         <Button
           className="text-tiny text-white bg-black/20"
           color="default"
@@ -52,7 +55,7 @@ const Lesson = () => {
     limit: 20,
     offset: 0
   })
-  const [lessonList, setLessonList] = useState([])
+  const [lessonList, setLessonList] = useState<LessonType[]>([])
   const getLessons = async () => {
     const res = await getLessonList(searchConfig)
     setLessonList(res.data.lessonList)
@@ -100,7 +103,14 @@ const Lesson = () => {
                 </div>
               </CardHeader>
               <CardBody>
-                <LessonCard></LessonCard>
+                <div className='flex flex-wrap justify-start gap-5'>
+                  {
+                    lessonList.map(i => {
+                      return <LessonCard key={i.id} {...i}></LessonCard>
+                    })
+                  }
+                </div>
+
               </CardBody>
             </>
           }
