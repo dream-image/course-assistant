@@ -6,5 +6,16 @@ export type LoginInfo = {
 export interface GetLessonListParams{
     limit:number;
     offset:number;
-    
+
+}
+export interface GetLessonListResponse{
+   
+    data:{
+        total:number;
+        lessonList:{
+            
+        }[]
+    }
+
+
 }

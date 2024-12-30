@@ -52,9 +52,14 @@ const Lesson = () => {
     limit: 20,
     offset: 0
   })
+  const [lessonList, setLessonList] = useState([])
+  const getLessons = async () => {
+    const res = await getLessonList(searchConfig)
+    setLessonList(res.data.lessonList)
+  }
   useEffect(() => {
     if (tabKey === 'center') {
-      getLessonList(searchConfig)
+      getLessons()
     }
   }, [tabKey])
 
