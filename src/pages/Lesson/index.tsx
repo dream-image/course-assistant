@@ -1,6 +1,5 @@
 import { getLessonList } from '@/api';
 import { LessonType } from '@/api/type';
-import Logo from '@/assets/404.svg'
 import { DashOutlined, EllipsisOutlined, SearchOutlined } from '@ant-design/icons';
 import { Button, Card, CardBody, CardFooter, CardHeader, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Image, Input, Tab, Tabs } from '@nextui-org/react'
 import { useEffect, useState } from 'react';
@@ -15,7 +14,7 @@ const LessonCard = (props: LessonType) => {
         alt={name}
         className=" bg-contain"
         height={200}
-        src="/public/defaultBg_LE_upscale_balanced_x4_light_ai_30.jpg"
+        src="/src/assets/defaultBgOfLesson.jpg"
         width={200}
       />
 

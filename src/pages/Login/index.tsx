@@ -1,4 +1,3 @@
-import Logo from '/public/logo.svg'
 import welcome from '@/assets/欢迎.svg'
 import { Button, Image, Input, Link } from '@nextui-org/react'
 import { useNavigate } from 'react-router-dom'
@@ -46,7 +45,7 @@ const Login = () => {
     <div className='grid grid-cols-2 h-screen min-w-[800px] animate-opacity'>
       <div className=' w-full   flex flex-col  items-center '>
         <div className='flex  items-center w-96'>
-          <Image src={Logo} alt="天书" width={50} height={50} />
+          <Image src="/public/logo.svg" alt="天书" width={50} height={50} />
           <span className='font-semibold font-kai text-2xl'>天书</span>
         </div>
         <div className=' h-[400px] flex-col mt-32 w-96 animate__animated  animate__bounceIn '>
