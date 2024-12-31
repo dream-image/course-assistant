@@ -1,0 +1,11 @@
+.scroll {
+  /* &::-webkit-scrollbar {
+    display: none;
+  } */
+
+}
+.accordionItem{
+  button{
+    padding: 0;
+  }
+}

@@ -76,7 +76,7 @@ const Home = () => {
       <div className='fixed top-0 w-full h-[76px] border-b-1 border-blue-50  flex justify-center'>
         <div className='w-[1680px] flex'>
           <div className='flex  items-center w-max ml-4 h-full'>
-            <Image src="/public/logo.svg" alt="天书" width={50} height={50} />
+            <Image src="/logo.svg" alt="天书" width={50} height={50} />
             <span className='font-semibold font-kai text-2xl text-gray-700'>天书</span>
           </div>
           <div className='flex-1 ml-8 flex items-center'>

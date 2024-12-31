@@ -36,6 +36,7 @@ const Login = () => {
       navigate('/ai')
     } catch (error: any) {
       const msg = error.error_msg || error.message
+      message.error(msg)
       console.log(msg)
     }
   }
@@ -45,7 +46,7 @@ const Login = () => {
     <div className='grid grid-cols-2 h-screen min-w-[800px] animate-opacity'>
       <div className=' w-full   flex flex-col  items-center '>
         <div className='flex  items-center w-96'>
-          <Image src="/public/logo.svg" alt="天书" width={50} height={50} />
+          <Image src="/logo.svg" alt="天书" width={50} height={50} />
           <span className='font-semibold font-kai text-2xl'>天书</span>
         </div>
         <div className=' h-[400px] flex-col mt-32 w-96 animate__animated  animate__bounceIn '>

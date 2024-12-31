@@ -83,7 +83,8 @@ const Info = () => {
                         message.success('修改成功')
                         setUserInfoContext({ ...userInfo, ...newInfo.info })
                         return true;
-                      } catch (error) {
+                      } catch (error:any) {
+                        message.error(error?.error_msg || '修改失败')
                         return false
                       }
 
