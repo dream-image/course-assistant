@@ -25,12 +25,13 @@ import {
   Tab,
   Tabs,
 } from "@nextui-org/react";
-import { forwardRef, useEffect, useState } from "react";
+import { forwardRef, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import InfiniteScroll from "react-infinite-scroll-component";
+import InfiniteScroll from "@/components/InfiniteScroll";
 import { pick } from "lodash-es";
 import styles from "./style.module.css";
 import dayjs from "dayjs";
+import { List, message } from "antd";
 const LessonCard = forwardRef((props: LessonType, ref) => {
   const { name, status, teacherName, startTime, endTime } = props;
   const statusInfo = LessonStatusMap[status];
@@ -47,8 +48,8 @@ const LessonCard = forwardRef((props: LessonType, ref) => {
         height={200}
         src="/src/assets/defaultBgOfLesson.jpg"
         width={300}
-        onClick={()=>{
-          setSelectedKeys(selectedKeys.has("1") ? new Set() : new Set("1"))
+        onClick={() => {
+          setSelectedKeys(selectedKeys.has("1") ? new Set() : new Set("1"));
         }}
       />
       <Accordion
@@ -60,13 +61,16 @@ const LessonCard = forwardRef((props: LessonType, ref) => {
         <AccordionItem
           key="1"
           aria-label="1"
-          startContent={<span className="text-sm text-white/80">详情</span>}
+          startContent={<span className="text-xs text-white/80">详情</span>}
           indicator={<></>}
           className={`${styles.accordionItem} `}
         >
-          <div className="flex flex-col gap-2 text-slate-500 bg-white text-sm p-2 rounded-md border-1 border-cyan-500 hover:cursor-pointer" onClick={()=>{
-            setSelectedKeys(selectedKeys.has("1") ? new Set() : new Set("1"))
-          }}>
+          <div
+            className="flex flex-col gap-2 text-slate-500 bg-white text-sm p-2 rounded-md border-1 border-cyan-500 hover:cursor-pointer"
+            onClick={() => {
+              setSelectedKeys(selectedKeys.has("1") ? new Set() : new Set("1"));
+            }}
+          >
             <p>{teacherName}</p>
             <p>
               开课时间：{dayjs(startTime).format("YYYY-MM-DD HH:mm")}至
@@ -92,7 +96,7 @@ const LessonCard = forwardRef((props: LessonType, ref) => {
         </Dropdown>
       </div>
       <CardFooter className="justify-between before:bg-white/10 border-white/20 border-1 overflow-hidden py-1 absolute before:rounded-xl rounded-large bottom-1 w-[calc(100%_-_8px)] shadow-small ml-1 z-10">
-        <p className="text-xs text-white/80 flex-1">
+        <div className="text-xs text-white/80 flex-1">
           <Chip
             //@ts-ignore
             color={statusInfo.color}
@@ -103,7 +107,7 @@ const LessonCard = forwardRef((props: LessonType, ref) => {
             {statusInfo.text}
           </Chip>
           <span>{name}</span>
-        </p>
+        </div>
         <Button
           className="text-tiny text-white bg-black/20"
           color="default"
@@ -118,7 +122,7 @@ const LessonCard = forwardRef((props: LessonType, ref) => {
   );
 });
 
-const DEFAULT_LIMIT = 20;
+const DEFAULT_LIMIT = 5;
 const Lesson = () => {
   const navigate = useNavigate();
   const [tabKey, setTabKey] = useState<string>("center");
@@ -135,22 +139,22 @@ const Lesson = () => {
       return;
     }
     setIsLoading(true);
-    const res = await getLessonList({
-      ...pick(searchConfig, "limit", "offset"),
-    });
-    setLessonList([...lessonList, ...res.data.lessonList]);
-    setSearchConfig({
-      limit: DEFAULT_LIMIT,
-      offset: searchConfig.offset + DEFAULT_LIMIT,
-      total: res.data.total,
-      hasMore: searchConfig.offset + DEFAULT_LIMIT < res.data.total,
-    });
-    console.log("触发了这个", {
-      limit: DEFAULT_LIMIT,
-      offset: searchConfig.offset + DEFAULT_LIMIT,
-      total: res.data.total,
-      hasMore: searchConfig.offset + DEFAULT_LIMIT < res.data.total,
-    });
+    try {
+      const res = await getLessonList({
+        ...pick(searchConfig, "limit", "offset"),
+      });
+      setLessonList([...lessonList, ...res.data.lessonList]);
+      setSearchConfig({
+        limit: DEFAULT_LIMIT,
+        offset: searchConfig.offset + DEFAULT_LIMIT,
+        total: res.data.total,
+        hasMore: searchConfig.offset + DEFAULT_LIMIT < res.data.total,
+      });
+    } catch (error: any) {
+      const msg = error?.error_msg || error?.message || error;
+      message.error(msg);
+    }
+
     setIsLoading(false);
   };
   const refresh = async () => {
@@ -167,9 +171,7 @@ const Lesson = () => {
     });
   };
   useEffect(() => {
-    if (tabKey === "center") {
-      getLessons();
-    }
+   
   }, [tabKey]);
 
   return (
@@ -218,9 +220,9 @@ const Lesson = () => {
                   next={getLessons}
                   hasMore={searchConfig.hasMore}
                   loader={
-                    <Spacer>
+                    <div className="flex justify-center  w-full">
                       <Spinner size="md" />
-                    </Spacer>
+                    </div>
                   }
                   className={styles.scroll}
                   endMessage={
@@ -231,9 +233,6 @@ const Lesson = () => {
                   refreshFunction={() => {
                     console.log("触发了这个");
                   }}
-                  // scrollableTarget="scrollableDiv"
-
-                  height="auto"
                 >
                   <div className="flex flex-wrap justify-start gap-8">
                     {lessonList.map((i) => {

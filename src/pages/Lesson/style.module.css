@@ -2,10 +2,12 @@
   /* &::-webkit-scrollbar {
     display: none;
   } */
-
+  min-height: 40px;
 }
-.accordionItem{
-  button{
+
+
+.accordionItem {
+  button {
     padding: 0;
   }
 }

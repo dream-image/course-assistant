@@ -8,7 +8,7 @@ export type BaseResponse<T> = {
 }
 const request = axios.create({
     baseURL: 'http://localhost:8888/',
-    timeout: 2000,
+    timeout: 5000,
 });
 request.interceptors.request.use(function (config) {
     config.headers.Authorization = getToken() || ""
