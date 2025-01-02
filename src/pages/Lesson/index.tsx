@@ -170,9 +170,7 @@ const Lesson = () => {
       hasMore: DEFAULT_LIMIT < res.data.total,
     });
   };
-  useEffect(() => {
-   
-  }, [tabKey]);
+  useEffect(() => {}, [tabKey]);
 
   return (
     <div className=" w-[1680px] h-full flex ml-4 relative">

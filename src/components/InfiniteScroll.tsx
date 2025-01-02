@@ -34,7 +34,7 @@ export function parseThreshold(scrollThreshold: string | number) {
     }
 
     console.warn(
-      'scrollThreshold format is invalid. Valid formats: "120px", "50%"...'
+      'scrollThreshold format is invalid. Valid formats: "120px", "50%"...',
     );
 
     return defaultThreshold;
@@ -85,7 +85,7 @@ export default class InfiniteScroll extends Component<Props, State> {
     };
 
     this.throttledOnScrollListener = throttle(this.onScrollListener, 150).bind(
-      this
+      this,
     );
     this.onStart = this.onStart.bind(this);
     this.onMove = this.onMove.bind(this);
@@ -112,7 +112,7 @@ export default class InfiniteScroll extends Component<Props, State> {
     if (typeof this.props.dataLength === "undefined") {
       throw new Error(
         `mandatory prop "dataLength" is missing. The prop is needed` +
-          ` when loading more content. Check README.md for usage`
+          ` when loading more content. Check README.md for usage`,
       );
     }
 
@@ -121,7 +121,7 @@ export default class InfiniteScroll extends Component<Props, State> {
     if (this.el) {
       this.el.addEventListener(
         "scroll",
-        this.throttledOnScrollListener as EventListenerOrEventListenerObject
+        this.throttledOnScrollListener as EventListenerOrEventListenerObject,
       );
       this.IntervalSearch = setInterval(
         (() => {
@@ -134,7 +134,7 @@ export default class InfiniteScroll extends Component<Props, State> {
             this.setState({ showLoader: true });
             this.props.next && this.props.next();
           }
-        }).bind(this)
+        }).bind(this),
       );
     }
 
@@ -169,7 +169,7 @@ export default class InfiniteScroll extends Component<Props, State> {
         throw new Error(
           `Mandatory prop "refreshFunction" missing.
           Pull Down To Refresh functionality will not work
-          as expected. Check README.md for usage'`
+          as expected. Check README.md for usage'`,
         );
       }
     }
@@ -179,7 +179,7 @@ export default class InfiniteScroll extends Component<Props, State> {
     if (this.el) {
       this.el.removeEventListener(
         "scroll",
-        this.throttledOnScrollListener as EventListenerOrEventListenerObject
+        this.throttledOnScrollListener as EventListenerOrEventListenerObject,
       );
 
       if (this.props.pullDownToRefresh) {
@@ -316,7 +316,7 @@ export default class InfiniteScroll extends Component<Props, State> {
 
   isElementAtBottom(
     target: HTMLElement,
-    scrollThreshold: string | number = 0.95
+    scrollThreshold: string | number = 0.95,
   ) {
     const clientHeight = target.clientHeight;
 

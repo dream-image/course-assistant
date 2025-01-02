@@ -1,59 +1,66 @@
-import {  Spinner } from '@nextui-org/react'
-import {  useEffect, useState } from 'react'
-import { createBrowserRouter, RouterProvider } from 'react-router-dom'
-import { authRouter, NotAuthRouterList } from './router'
-import { UserInfoContext } from './context/UserInfoContext'
-import { UserInfo } from './types'
-import { getUserInfo } from './api'
-import { autoRefreshToken } from './utils/autoRefreshToken'
-import { message } from 'antd'
-
+import { Spinner } from "@nextui-org/react";
+import { useEffect, useState } from "react";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { authRouter, NotAuthRouterList } from "./router";
+import { UserInfoContext } from "./context/UserInfoContext";
+import { UserInfo } from "./types";
+import { getUserInfo } from "./api";
+import { autoRefreshToken } from "./utils/autoRefreshToken";
+import { message } from "antd";
 
 function App() {
-  const [userInfo, setUserInfo] = useState<UserInfo>({} as UserInfo)
-  const [isLoading, setIsLoading] = useState(true)
+  const [userInfo, setUserInfo] = useState<UserInfo>({} as UserInfo);
+  const [isLoading, setIsLoading] = useState(true);
   const init = async () => {
     try {
-      setIsLoading(true)
-      const res = await getUserInfo()
-      setUserInfo({ ...res.data, hasLogin: true })
-      console.log('已登录');
-      autoRefreshToken()
+      setIsLoading(true);
+      const res = await getUserInfo();
+      setUserInfo({ ...res.data, hasLogin: true });
+      console.log("已登录");
+      autoRefreshToken();
     } catch (error: any) {
-      const msg = error?.error_msg || error?.message||error
+      const msg = error?.error_msg || error?.message || error;
       console.log(msg);
-      message.error({ content: msg })
+      message.error({ content: msg });
       setTimeout(() => {
-        location.replace('/login')
+        location.replace("/login");
       }, 1000);
     }
-    setIsLoading(false)
-  }
+    setIsLoading(false);
+  };
   useEffect(() => {
-    if (userInfo.hasLogin || NotAuthRouterList.some(i => new RegExp(`/${i}$`).test(window.location.pathname))) {
-      setIsLoading(false)
-      return
+    if (
+      userInfo.hasLogin ||
+      NotAuthRouterList.some((i) =>
+        new RegExp(`/${i}$`).test(window.location.pathname),
+      )
+    ) {
+      setIsLoading(false);
+      return;
     }
-    init()
-  }, [])
+    init();
+  }, []);
 
   return (
-    <>{
-      isLoading ? <Spinner></Spinner> : (
-        <UserInfoContext.Provider value={{
-          userInfo, setUserInfoContext: (props) => {
-            setUserInfo(props)
-          }
-        }}>
+    <>
+      {isLoading ? (
+        <Spinner></Spinner>
+      ) : (
+        <UserInfoContext.Provider
+          value={{
+            userInfo,
+            setUserInfoContext: (props) => {
+              setUserInfo(props);
+            },
+          }}
+        >
           <RouterProvider
-            router={createBrowserRouter(authRouter(userInfo.uGroup ?? []))}>
-          </RouterProvider>
-
-        </UserInfoContext.Provider >
-      )
-    }
+            router={createBrowserRouter(authRouter(userInfo.uGroup ?? []))}
+          ></RouterProvider>
+        </UserInfoContext.Provider>
+      )}
     </>
-  )
+  );
 }
 
-export default App
+export default App;
