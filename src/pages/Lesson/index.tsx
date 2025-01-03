@@ -124,7 +124,6 @@ const LessonCard = forwardRef((props: LessonType, ref) => {
 
 const DEFAULT_LIMIT = 5;
 const Lesson = () => {
-  const navigate = useNavigate();
   const [tabKey, setTabKey] = useState<string>("center");
   const [searchConfig, setSearchConfig] = useState({
     limit: DEFAULT_LIMIT,

@@ -8,7 +8,7 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "commit": "prettier . --check --write && git add . && git commit"
+    "commit": "prettier . --check --write &&  eslint src --fix && git add . && git commit"
   },
   "dependencies": {
     "@ant-design/icons": "^5.5.1",
