@@ -31,6 +31,7 @@ export const LessonStatusMap = {
 
 export type LessonType = {
   id: number;
+  lessonId: number;
   name: string;
   createTime: ScrollNumberProps;
   ownerId: number;
@@ -39,6 +40,12 @@ export type LessonType = {
   endTime: number;
   teacherName: string;
 };
+export interface GetLessonInfoResponse {
+  data: {
+    total: number;
+    list: LessonType[];
+  };
+}
 export interface GetLessonListResponse {
   data: {
     total: number;

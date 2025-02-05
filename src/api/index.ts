@@ -1,9 +1,11 @@
 import request, { BaseResponse, get, post } from "@/common/request";
 import { UserInfo } from "@/types";
-import { GetLessonListParams, GetLessonListResponse, LoginInfo } from "./type";
-import { Stream } from "openai/src/streaming.js";
-import OpenAI from "openai";
-import { APIPromise } from "openai/core.mjs";
+import {
+  GetLessonInfoResponse,
+  GetLessonListParams,
+  GetLessonListResponse,
+  LoginInfo,
+} from "./type";
 
 export const refreshToken = async () => {
   return get<{ availableTime: number }>("/token/refresh");
@@ -20,16 +22,9 @@ export const getLessonList = async (
 ): Promise<GetLessonListResponse> => {
   return get("/lesson/list", params);
 };
-export const chat = async (params: {
-  history: any[];
-  message: string;
-}): Promise<
-  BaseResponse<
-    APIPromise<
-      | Stream<OpenAI.Chat.Completions.ChatCompletionChunk>
-      | OpenAI.Chat.Completions.ChatCompletion
-    >
-  >
-> => {
-  return await post("/chat", params);
+
+export const getLessonInfo = async (
+  id: number,
+): Promise<GetLessonInfoResponse> => {
+  return get(`/lesson/detail/${id}`);
 };

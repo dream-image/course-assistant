@@ -13,3 +13,7 @@ export const useUserInfo = () => {
   const userInfo = useContext(UserInfoContext);
   return userInfo;
 };
+
+export const loadingText = (loading: boolean) => {
+  return loading ? "加载中..." : "";
+};

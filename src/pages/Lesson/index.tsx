@@ -29,7 +29,7 @@ import styles from "./style.module.css";
 import dayjs from "dayjs";
 import { List, message } from "antd";
 const LessonCard = forwardRef((props: LessonType, ref) => {
-  const { name, status, teacherName, startTime, endTime, id } = props;
+  const { name, status, teacherName, startTime, endTime, lessonId } = props;
   const statusInfo = LessonStatusMap[status];
   const [selectedKeys, setSelectedKeys] = useState(new Set(["0"]));
   const navigate = useNavigate();
@@ -111,7 +111,7 @@ const LessonCard = forwardRef((props: LessonType, ref) => {
           size="sm"
           variant="flat"
           onClick={() => {
-            navigate(`/ai/chatai/${id}`);
+            navigate(`/ai/chatai/${lessonId}`);
           }}
         >
           提问
