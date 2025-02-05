@@ -1,7 +1,7 @@
 import { getLessonList } from "@/api";
 import { LessonStatusMap, LessonType } from "@/api/type";
 import {
-  DashOutlined,
+
   EllipsisOutlined,
   SearchOutlined,
 } from "@ant-design/icons";
@@ -33,21 +33,22 @@ import styles from "./style.module.css";
 import dayjs from "dayjs";
 import { List, message } from "antd";
 const LessonCard = forwardRef((props: LessonType, ref) => {
-  const { name, status, teacherName, startTime, endTime } = props;
+  const { name, status, teacherName, startTime, endTime,id } = props;
   const statusInfo = LessonStatusMap[status];
   const [selectedKeys, setSelectedKeys] = useState(new Set(["0"]));
+  const navigate = useNavigate();
   return (
     <Card
       isFooterBlurred
-      className="border-none relative w-[300px] h-[200px] overflow-visible"
+      className="border-none relative min-w-[300px] max-w-[370px] h-[200px] overflow-visible flex-1"
       radius="lg"
     >
       <Image
         alt={name}
-        className=" bg-contain hover:cursor-pointer"
+        className=" bg-contain hover:cursor-pointer min-w-[300px] flex-1"
         height={200}
         src="/src/assets/defaultBgOfLesson.jpg"
-        width={300}
+       
         onClick={() => {
           setSelectedKeys(selectedKeys.has("1") ? new Set() : new Set("1"));
         }}
@@ -114,6 +115,9 @@ const LessonCard = forwardRef((props: LessonType, ref) => {
           radius="lg"
           size="sm"
           variant="flat"
+          onClick={()=>{
+            navigate(`/ai/chatai/${id}`)
+          }}
         >
           提问
         </Button>
@@ -228,7 +232,7 @@ const Lesson = () => {
                     </p>
                   }
                   refreshFunction={() => {
-                    console.log("触发了这个");
+
                   }}
                 >
                   <div className="flex flex-wrap justify-start gap-8">

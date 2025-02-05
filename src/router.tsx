@@ -12,16 +12,19 @@ export const NotAuthRouterList = ["register", "login"];
 
 export const router: RouteObject[] = [
   {
-    path: "chatai",
+    path: "chatai/:id",
     element: <ChatAI />,
+    id: "chatai"
   },
   {
     path: "lesson",
     element: <Lesson />,
+    id: "lesson"
   },
   {
     path: "manage",
     element: <Manage />,
+    id: "manage"
   },
 ];
 
@@ -36,7 +39,7 @@ export const authRouter = (uGroup: string[]): RouteObject[] => {
       element: <Login />,
     },
     {
-      path: "register",
+      path: "/register",
       element: <Register />,
     },
     {
@@ -46,7 +49,7 @@ export const authRouter = (uGroup: string[]): RouteObject[] => {
         .filter((i) => {
           return uGroup
             .map((i) => i.toLocaleUpperCase())
-            .includes(i.path!.toLocaleUpperCase());
+            .includes(i.id!.toLocaleUpperCase());
         })
         .concat([
           {
