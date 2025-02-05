@@ -14,17 +14,17 @@ export const router: RouteObject[] = [
   {
     path: "chatai/:id",
     element: <ChatAI />,
-    id: "chatai"
+    id: "chatai",
   },
   {
     path: "lesson",
     element: <Lesson />,
-    id: "lesson"
+    id: "lesson",
   },
   {
     path: "manage",
     element: <Manage />,
-    id: "manage"
+    id: "manage",
   },
 ];
 

@@ -20,7 +20,7 @@ const Demo: React.FC = () => {
       let content: string = "";
       bubbleWrapperRef.current?.scrollTo(
         0,
-        bubbleWrapperRef.current?.scrollHeight
+        bubbleWrapperRef.current?.scrollHeight,
       );
 
       try {

@@ -1,10 +1,6 @@
 import { getLessonList } from "@/api";
 import { LessonStatusMap, LessonType } from "@/api/type";
-import {
-
-  EllipsisOutlined,
-  SearchOutlined,
-} from "@ant-design/icons";
+import { EllipsisOutlined, SearchOutlined } from "@ant-design/icons";
 import {
   Accordion,
   AccordionItem,
@@ -33,7 +29,7 @@ import styles from "./style.module.css";
 import dayjs from "dayjs";
 import { List, message } from "antd";
 const LessonCard = forwardRef((props: LessonType, ref) => {
-  const { name, status, teacherName, startTime, endTime,id } = props;
+  const { name, status, teacherName, startTime, endTime, id } = props;
   const statusInfo = LessonStatusMap[status];
   const [selectedKeys, setSelectedKeys] = useState(new Set(["0"]));
   const navigate = useNavigate();
@@ -48,7 +44,6 @@ const LessonCard = forwardRef((props: LessonType, ref) => {
         className=" bg-contain hover:cursor-pointer min-w-[300px] flex-1"
         height={200}
         src="/src/assets/defaultBgOfLesson.jpg"
-       
         onClick={() => {
           setSelectedKeys(selectedKeys.has("1") ? new Set() : new Set("1"));
         }}
@@ -115,8 +110,8 @@ const LessonCard = forwardRef((props: LessonType, ref) => {
           radius="lg"
           size="sm"
           variant="flat"
-          onClick={()=>{
-            navigate(`/ai/chatai/${id}`)
+          onClick={() => {
+            navigate(`/ai/chatai/${id}`);
           }}
         >
           提问
@@ -231,9 +226,7 @@ const Lesson = () => {
                       {searchConfig.total > DEFAULT_LIMIT && <b>已经到底啦</b>}
                     </p>
                   }
-                  refreshFunction={() => {
-
-                  }}
+                  refreshFunction={() => {}}
                 >
                   <div className="flex flex-wrap justify-start gap-8">
                     {lessonList.map((i) => {

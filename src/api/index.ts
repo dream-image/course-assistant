@@ -20,6 +20,16 @@ export const getLessonList = async (
 ): Promise<GetLessonListResponse> => {
   return get("/lesson/list", params);
 };
-export const chat = async (params: { history: any[], message: string }): Promise<BaseResponse<APIPromise<Stream<OpenAI.Chat.Completions.ChatCompletionChunk> | OpenAI.Chat.Completions.ChatCompletion>>> => {
-  return await post("/chat", params)
-}
+export const chat = async (params: {
+  history: any[];
+  message: string;
+}): Promise<
+  BaseResponse<
+    APIPromise<
+      | Stream<OpenAI.Chat.Completions.ChatCompletionChunk>
+      | OpenAI.Chat.Completions.ChatCompletion
+    >
+  >
+> => {
+  return await post("/chat", params);
+};
