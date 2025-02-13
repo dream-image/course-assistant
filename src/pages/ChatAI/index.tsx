@@ -1,6 +1,6 @@
 import { getAiVersions, getLessonInfo } from "@/api";
 import { useXAgent, useXChat, Sender, Bubble } from "@ant-design/x";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { message, Space, Typography } from "antd";
 import styles from "./style.module.css";
 import { Button, Card, CardBody } from "@nextui-org/react";
@@ -93,7 +93,7 @@ md.renderer.rules.fence = (tokens, idx) => {
     <span class="${styles["sp"]}">复制</span>
     </button>
   </div>
-    <pre class="hljs language-${lang} border-0 flex-1 m-0"><code>${hlContent}</code></pre>
+    <pre class="hljs language-${lang} border-0 flex-1 m-0" style="margin:0;"><code>${hlContent}</code></pre>
   </div>
   `;
 };
@@ -123,6 +123,13 @@ const ChatAI: React.FC = () => {
   const modalRef = useRef<string>();
   const messageRef = useRef<string>();
   const [modalBarVisible, setModalBarVisible] = useState(true);
+  const defaultModalName = useMemo(() => {
+    const currentDefalut = localStorage.getItem("defaultModalName");
+    if (modalList.find((i) => i.name === currentDefalut)) {
+      return currentDefalut;
+    }
+    return modalList[0]?.name;
+  }, [modalList]);
   const [agent] = useXAgent({
     request: async (info, callbacks) => {
       const { messages, message: _message } = info;
@@ -386,10 +393,11 @@ const ChatAI: React.FC = () => {
                 <>
                   <div className=" max-w-[650px] overflow-auto">
                     <CustomeButtonRadioGroup
-                      defaultValue={modalList[0]?.name}
+                      defaultValue={defaultModalName}
                       value={modal?.name}
                       className="flex gap-3 flex-none max-w-max"
                       onSelect={(v) => {
+                        localStorage.setItem("defaultModalName", v || "");
                         setModal(modalList.find((i) => i.name === v));
                       }}
                       list={modalList.map((i) => {

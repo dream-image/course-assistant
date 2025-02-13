@@ -6,7 +6,7 @@ type Props = {
     value: string;
     label: string;
   }[];
-  defaultValue?: string;
+  defaultValue?: string | null;
   value?: string;
   onSelect: (value: string) => void;
   style?: React.CSSProperties;
