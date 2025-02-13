@@ -52,3 +52,15 @@ export interface GetLessonListResponse {
     lessonList: LessonType[];
   };
 }
+
+export interface GetAiVersionsResponse {
+  data: {
+    modal: Modal[];
+  };
+}
+
+export interface Modal {
+  version: string;
+  url: string;
+  name: string;
+}

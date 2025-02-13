@@ -111,7 +111,7 @@ const LessonCard = forwardRef((props: LessonType, ref) => {
           size="sm"
           variant="flat"
           onClick={() => {
-            navigate(`/ai/chatai/${lessonId}`);
+            navigate(`/ai/chat/${lessonId}`);
           }}
         >
           提问

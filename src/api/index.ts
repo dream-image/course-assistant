@@ -1,6 +1,7 @@
 import request, { BaseResponse, get, post } from "@/common/request";
 import { UserInfo } from "@/types";
 import {
+  GetAiVersionsResponse,
   GetLessonInfoResponse,
   GetLessonListParams,
   GetLessonListResponse,
@@ -27,4 +28,8 @@ export const getLessonInfo = async (
   id: number,
 ): Promise<GetLessonInfoResponse> => {
   return get(`/lesson/detail/${id}`);
+};
+
+export const getAiVersions = async (): Promise<GetAiVersionsResponse> => {
+  return get("/ai/version");
 };

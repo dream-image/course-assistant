@@ -12,7 +12,7 @@ export const NotAuthRouterList = ["register", "login"];
 
 export const router: RouteObject[] = [
   {
-    path: "chatai/:id",
+    path: "chat/:id",
     element: <ChatAI />,
     id: "chatai",
   },

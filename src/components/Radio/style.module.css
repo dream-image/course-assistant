@@ -1,0 +1,14 @@
+.active {
+  position: relative;
+  color: white;
+  &::before {
+    content: "";
+    background: linear-gradient(135deg, #6253e1, #04befe);
+    position: absolute;
+    transition: all 0.5s;
+    inset: -1px;
+    z-index: -1;
+    opacity: 1;
+    border-radius: inherit;
+  }
+}
