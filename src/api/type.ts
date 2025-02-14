@@ -8,6 +8,7 @@ export type LoginInfo = {
 export interface GetLessonListParams {
   limit: number;
   offset: number;
+  lessonName?: string;
 }
 export enum LessonStatus {
   READY = "ready",

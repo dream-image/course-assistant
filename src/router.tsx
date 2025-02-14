@@ -12,23 +12,24 @@ export const NotAuthRouterList = ["register", "login"];
 
 export const router: RouteObject[] = [
   {
-    path: "chat/:id",
-    element: <ChatAI />,
-    id: "chatai",
-  },
-  {
     path: "lesson",
     element: <Lesson />,
     id: "lesson",
   },
   {
-    path: "manage",
+    path: "chat/:id",
+    element: <ChatAI />,
+    id: "chatai",
+  },
+  {
+    path: "manage/:id",
     element: <Manage />,
     id: "manage",
   },
 ];
 
 export const authRouter = (uGroup: string[]): RouteObject[] => {
+  const _uGroup = uGroup.map((i) => i.toLocaleUpperCase());
   const baseRouter: RouteObject[] = [
     {
       path: "/",
@@ -45,13 +46,21 @@ export const authRouter = (uGroup: string[]): RouteObject[] => {
     {
       path: "/ai",
       element: <Home />,
+      //@ts-ignore
       children: router
         .filter((i) => {
-          return uGroup
-            .map((i) => i.toLocaleUpperCase())
-            .includes(i.id!.toLocaleUpperCase());
+          return _uGroup.includes(i.id!.toLocaleUpperCase());
+        })
+        .map((i) => {
+          return {
+            ...i,
+            children: i?.children?.filter((i) => {
+              return _uGroup.includes(i.id!.toLocaleUpperCase());
+            }),
+          };
         })
         .concat([
+          //@ts-ignore
           {
             path: "info",
             element: <Info />,

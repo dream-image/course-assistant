@@ -19,6 +19,7 @@ import {
 import { getToken } from "@/utils";
 import markdownit from "markdown-it";
 import CustomeButtonRadioGroup from "@/components/Radio";
+import NewChat from "@/components/newChat";
 const enum AbnormalState {
   LOADING = "loading",
   ERROR = "error",
@@ -220,6 +221,7 @@ const ChatAI: React.FC = () => {
     onRequest,
     // use to render messages
     messages,
+    setMessages,
   } = useXChat({ agent });
 
   const items: BubbleListProps["items"] = messages.map(
@@ -318,6 +320,11 @@ const ChatAI: React.FC = () => {
       navigate(-1);
     }
   };
+
+  const CreateNewChat = async () => {
+    setMessages([]);
+  };
+
   useEffect(() => {
     modalRef.current = modal?.name;
   }, [modal]);
@@ -347,6 +354,11 @@ const ChatAI: React.FC = () => {
         ref={bubbleWrapperRef}
       >
         <Bubble.List items={items} autoScroll />
+        {messages.length !== 0 ? (
+          <NewChat className=" scale-[60%] mx-auto" onClick={CreateNewChat}>
+            开启新对话
+          </NewChat>
+        ) : null}
       </div>
       <div className="w-full mt-2 mx-auto left-0 right-0 bottom-5 z-[2]">
         <Sender

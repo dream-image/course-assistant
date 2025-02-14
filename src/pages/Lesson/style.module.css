@@ -1,7 +1,7 @@
 .scroll {
-  /* &::-webkit-scrollbar {
+  &::-webkit-scrollbar {
     display: none;
-  } */
+  }
   min-height: 40px;
 }
 
