@@ -1,5 +1,6 @@
 import { refreshToken } from "@/api";
 import { UserInfoContext } from "@/context/UserInfoContext";
+import { GetProp, UploadProps } from "antd";
 import { useContext } from "react";
 
 export const getToken = () => {
@@ -16,4 +17,11 @@ export const useUserInfo = () => {
 
 export const loadingText = (loading: boolean) => {
   return loading ? "加载中..." : "";
+};
+
+export type FileType = Parameters<GetProp<UploadProps, "beforeUpload">>[0];
+export const getBase64 = (img: FileType, callback: (url: string) => void) => {
+  const reader = new FileReader();
+  reader.addEventListener("load", () => callback(reader.result as string));
+  reader.readAsDataURL(img);
 };

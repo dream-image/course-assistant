@@ -40,6 +40,8 @@ export type LessonType = {
   startTime: number;
   endTime: number;
   teacherName: string;
+  //封面图片文件名称
+  cover: string;
 };
 export interface GetLessonInfoResponse {
   data: {

@@ -19,6 +19,8 @@ import {
   Spinner,
   Tab,
   Tabs,
+  Breadcrumbs,
+  BreadcrumbItem,
 } from "@nextui-org/react";
 import { forwardRef, useContext, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -28,6 +30,7 @@ import styles from "./style.module.css";
 import dayjs from "dayjs";
 import { message } from "antd";
 import { UserInfoContext } from "@/context/UserInfoContext";
+import { REQUEST_BASE_URL } from "@/common/request";
 const LessonCard = forwardRef(
   (props: LessonType & { isShowManage?: boolean }, ref) => {
     const {
@@ -38,6 +41,7 @@ const LessonCard = forwardRef(
       endTime,
       lessonId,
       isShowManage = false,
+      cover,
     } = props;
     const statusInfo = LessonStatusMap[status];
     const [selectedKeys, setSelectedKeys] = useState(new Set(["0"]));
@@ -52,7 +56,7 @@ const LessonCard = forwardRef(
           alt={name}
           className=" bg-contain hover:cursor-pointer min-w-[300px] flex-1"
           height={200}
-          src="/src/assets/defaultBgOfLesson.jpg"
+          src={`${REQUEST_BASE_URL}/cover/${cover}`}
           onClick={() => {
             setSelectedKeys(selectedKeys.has("1") ? new Set() : new Set("1"));
           }}
@@ -225,7 +229,18 @@ const Lesson = () => {
             <>
               <CardHeader>
                 <div className="flex flex-row justify-between w-full items-center">
-                  <span className="text-xl flex-1">我的课程</span>
+                  <div className="flex-1">
+                    <Breadcrumbs
+                      itemClasses={{
+                        separator: "px-2",
+                      }}
+                      size="lg"
+                      separator="/"
+                    >
+                      <BreadcrumbItem>我的课程</BreadcrumbItem>
+                    </Breadcrumbs>
+                  </div>
+
                   <Input
                     autoComplete="on"
                     isClearable
@@ -286,7 +301,7 @@ const Lesson = () => {
                         <LessonCard
                           key={i.id}
                           {...i}
-                          isShowManage={userInfo.role === "teacher"}
+                          isShowManage={userInfo.userid === i.ownerId}
                         ></LessonCard>
                       );
                     })}

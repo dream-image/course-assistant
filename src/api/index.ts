@@ -33,3 +33,7 @@ export const getLessonInfo = async (
 export const getAiVersions = async (): Promise<GetAiVersionsResponse> => {
   return get("/ai/version");
 };
+
+export const changeLessonCover = async (params: { lessonId: number }) => {
+  return post("/cover/new/lesson", params);
+};

@@ -74,7 +74,7 @@ md.renderer.rules.fence = (tokens, idx) => {
    <div class="${styles["code-block-wrapper"]} bg-[#181d28] text-slate-50 flex flex-col ring-inset ring-1 ring-offset-cyan-100 rounded-lg overflow-hidden">
   <div class=" flex justify-between items-center pl-3 bg-[#50505a]">
   <span>${lang}</span>
-    <button class="copy-button flex items-center ${styles["copy-button"]}" data-clipboard-text="${content}">
+    <button class="copy-button flex items-center ${styles["copy-button"]}" data-clipboard-text="\`${content}\`">
     <svg
     viewBox="0 0 24 24"
     height="12"

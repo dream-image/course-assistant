@@ -6,8 +6,9 @@ export type BaseResponse<T> = {
   error_msg: string;
   data: T;
 };
+export const REQUEST_BASE_URL = "http://localhost:8888";
 const request = axios.create({
-  baseURL: "http://localhost:8888/",
+  baseURL: REQUEST_BASE_URL,
   timeout: 5000,
 });
 request.interceptors.request.use(function (config) {

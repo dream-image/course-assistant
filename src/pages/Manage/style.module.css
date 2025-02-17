@@ -1,0 +1,8 @@
+.upload {
+  height: 202px;
+  width: 362px;
+  :global(div.ant-upload.ant-upload-select) {
+    height: 100% !important;
+    width: 100% !important;
+  }
+}
