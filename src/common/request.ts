@@ -9,7 +9,7 @@ export type BaseResponse<T> = {
 export const REQUEST_BASE_URL = "http://localhost:8888";
 const request = axios.create({
   baseURL: REQUEST_BASE_URL,
-  timeout: 5000,
+  timeout: 30000,
 });
 request.interceptors.request.use(function (config) {
   config.headers.Authorization = getToken() || "";

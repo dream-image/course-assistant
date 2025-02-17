@@ -287,6 +287,16 @@ const Manage = () => {
                                 Authorization: getToken() || "",
                               }}
                               onChange={(info) => {
+                                if (
+                                  info.file.status === "error" ||
+                                  (info.file.response?.result &&
+                                    info.file.response?.result !== 1)
+                                ) {
+                                  message.error("上传失败,请稍后重试");
+                                  setIsCoverLoading(false);
+                                  onChange("");
+                                  return;
+                                }
                                 if (info.file.status === "uploading") {
                                   setIsCoverLoading(true);
                                   onChange("");
