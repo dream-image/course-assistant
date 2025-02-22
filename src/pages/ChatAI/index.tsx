@@ -87,7 +87,7 @@ const ChatAI: React.FC = () => {
       // scroll to bottom
       bubbleWrapperRef.current?.scrollTo(
         0,
-        bubbleWrapperRef.current?.scrollHeight
+        bubbleWrapperRef.current?.scrollHeight,
       );
       const controller = new AbortController();
       controllerRef.current = controller;
@@ -122,7 +122,7 @@ const ChatAI: React.FC = () => {
               setValue(_message);
               bubbleWrapperRef.current?.scrollTo(
                 0,
-                bubbleWrapperRef.current?.scrollHeight
+                bubbleWrapperRef.current?.scrollHeight,
               );
               messageRef.current = undefined;
               break;
@@ -154,7 +154,7 @@ const ChatAI: React.FC = () => {
         console.error(error);
         bubbleWrapperRef.current?.scrollTo(
           0,
-          bubbleWrapperRef.current?.scrollHeight
+          bubbleWrapperRef.current?.scrollHeight,
         );
         onSuccess(msg);
       }
@@ -172,34 +172,37 @@ const ChatAI: React.FC = () => {
   const items: BubbleListProps["items"] = messages.map(
     ({ message: _message, id }, index) => {
       let thinkContent: any = _message.match(
-        /<think-3ee1a747-f116-11ef-ae3b-00163e0e374c>[\s\S]*?(?=<\/think-3ee1a747-f116-11ef-ae3b-00163e0e374c>|<error-3ee1a747-f116-11ef-ae3b-00163e0e374c>|$)/
+        /<think-3ee1a747-f116-11ef-ae3b-00163e0e374c>[\s\S]*?(?=<\/think-3ee1a747-f116-11ef-ae3b-00163e0e374c>|<error-3ee1a747-f116-11ef-ae3b-00163e0e374c>|$)/,
       )?.[0];
 
       if (thinkContent) {
         _message = _message.replace(thinkContent, "");
-        _message=_message.replace(/<\/think-3ee1a747-f116-11ef-ae3b-00163e0e374c>/,"")
+        _message = _message.replace(
+          /<\/think-3ee1a747-f116-11ef-ae3b-00163e0e374c>/,
+          "",
+        );
         thinkContent = thinkContent.replace(
           /<think-3ee1a747-f116-11ef-ae3b-00163e0e374c>/,
-          ""
+          "",
         );
 
         thinkContent = thinkContent.replace(
           /<\/think-3ee1a747-f116-11ef-ae3b-00163e0e374c>/,
-          ""
+          "",
         );
       }
       let errorContent: any = _message.match(
-        /<error-3ee1a747-f116-11ef-ae3b-00163e0e374c>[\s\S]*?(?:<\/error-3ee1a747-f116-11ef-ae3b-00163e0e374c>|$)/
+        /<error-3ee1a747-f116-11ef-ae3b-00163e0e374c>[\s\S]*?(?:<\/error-3ee1a747-f116-11ef-ae3b-00163e0e374c>|$)/,
       )?.[0];
       if (errorContent) {
         _message = _message.replace(errorContent, "");
         errorContent = errorContent.replace(
           /<error-3ee1a747-f116-11ef-ae3b-00163e0e374c>/,
-          ""
+          "",
         );
         errorContent = errorContent.replace(
           /<\/error-3ee1a747-f116-11ef-ae3b-00163e0e374c>/,
-          ""
+          "",
         );
         if (AbnormalState.STOP === errorContent) {
           errorContent = <Alert color="primary" title={errorContent}></Alert>;
@@ -289,7 +292,7 @@ const ChatAI: React.FC = () => {
             </>
           ) : undefined,
       };
-    }
+    },
   );
   const init = async () => {
     try {
@@ -364,7 +367,7 @@ const ChatAI: React.FC = () => {
           loading={agent.isRequesting()}
           onCancel={() => {
             controllerRef.current?.abort(
-              messageRef.current || AbnormalState.STOP
+              messageRef.current || AbnormalState.STOP,
             );
           }}
           header={

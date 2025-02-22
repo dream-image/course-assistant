@@ -39,6 +39,6 @@ export const changeLessonCover = async (params: { lessonId: number }) => {
   return post("/cover/new/lesson", params);
 };
 
-export const updateLesson = async (params:UpdateLessonParams)=>{
+export const updateLesson = async (params: UpdateLessonParams) => {
   return post("/updateLesson", params);
-}
+};

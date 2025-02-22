@@ -25,7 +25,7 @@ request.interceptors.response.use(
     return response;
   },
   function (error) {
-    return Promise.reject(error?.response?.data||error);
+    return Promise.reject(error?.response?.data || error);
   },
 );
 export const get = async <T>(

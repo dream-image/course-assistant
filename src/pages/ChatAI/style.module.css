@@ -56,7 +56,7 @@
   transition: 0.3s;
   transform: scale(0.93);
 }
-.error-block{
+.error-block {
   background-color: #f8d7da;
   color: #721c24;
   padding: 10px;

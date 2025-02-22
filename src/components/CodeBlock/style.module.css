@@ -57,23 +57,23 @@
   transform: scale(0.93);
 }
 
-.markdown-wrapper{
-  :global(pre:not([class*="style-yes"])){
+.markdown-wrapper {
+  :global(pre:not([class*="style-yes"])) {
     padding: 0;
     border: none;
   }
 }
-.first-block{
+.first-block {
   border-bottom-right-radius: 0 !important;
   border-bottom-left-radius: 0 !important;
   border-bottom: none !important;
 }
-.last-block{
+.last-block {
   border-top-right-radius: 0 !important;
   border-top-left-radius: 0 !important;
   border-top: none !important;
 }
-.common-block{
+.common-block {
   border-radius: 0 !important;
   border-top: none !important;
   border-bottom: none !important;

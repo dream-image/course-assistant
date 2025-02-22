@@ -10,6 +10,6 @@
     padding: 0;
   }
 }
-.lessonCard > div{
+.lessonCard > div {
   max-width: none !important;
 }

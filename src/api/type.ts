@@ -1,4 +1,3 @@
-
 export type LoginInfo = {
   username?: string;
   password?: string;
@@ -40,7 +39,7 @@ export type LessonType = {
   endTime: number;
   teacherName: string;
   //学院
-  college:string;
+  college: string;
   //封面图片文件名称
   cover: string;
 };
@@ -69,12 +68,12 @@ export interface Modal {
   name: string;
 }
 
-export interface UpdateLessonParams{
+export interface UpdateLessonParams {
   lessonId: number;
   name: string;
   createTime: number;
   startTime: number;
   endTime: number;
   teacherName: string;
-  college:string;
+  college: string;
 }

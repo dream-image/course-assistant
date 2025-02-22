@@ -50,9 +50,11 @@ const LessonCard = forwardRef(
     return (
       <Card
         isFooterBlurred
-        className={cn("border-none relative min-w-[300px] max-w-[370px] h-[200px] overflow-visible flex-1",styles.lessonCard)}
+        className={cn(
+          "border-none relative min-w-[300px] max-w-[370px] h-[200px] overflow-visible flex-1",
+          styles.lessonCard,
+        )}
         radius="lg"
-        
       >
         <Image
           alt={name}

@@ -220,12 +220,12 @@ const Manage = () => {
                                   validator: (_, value) => {
                                     if (value.length < 1) {
                                       return Promise.reject(
-                                        "昵称长度不得小于1"
+                                        "昵称长度不得小于1",
                                       );
                                     }
                                     if (value.length > 20) {
                                       return Promise.reject(
-                                        "昵称长度不得大于20"
+                                        "昵称长度不得大于20",
                                       );
                                     }
                                     return Promise.resolve();
@@ -385,7 +385,7 @@ const Manage = () => {
                                     (url) => {
                                       setIsCoverLoading(false);
                                       onChange(url);
-                                    }
+                                    },
                                   );
                                 }
                               }}
@@ -478,12 +478,8 @@ const Manage = () => {
                       multiple
                       maxCount={5}
                       listType="picture"
-                      onRemove={(file) => {
-                       
-                      }}
-                      beforeUpload={(file) => {
-                       
-                      }}
+                      onRemove={(file) => {}}
+                      beforeUpload={(file) => {}}
                     >
                       <AntdButton type="primary" className=" rounded-xl h-10">
                         <UploadOutlined />
@@ -492,12 +488,7 @@ const Manage = () => {
                     </Upload>
                   </ModalBody>
                   <ModalFooter>
-                    <Button
-                      color="danger"
-                      variant="light"
-                      onPress={() => {
-                      }}
-                    >
+                    <Button color="danger" variant="light" onPress={() => {}}>
                       取消
                     </Button>
                     <Button

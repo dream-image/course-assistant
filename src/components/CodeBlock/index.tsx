@@ -85,7 +85,11 @@ const CodeBlock = ({
 const MarkdownRenderer = ({
   data,
 }: {
-  data: { content?: string | React.ReactNode; className?: string; isThink?: boolean }[];
+  data: {
+    content?: string | React.ReactNode;
+    className?: string;
+    isThink?: boolean;
+  }[];
 }) => {
   const length = data.length;
 
@@ -107,10 +111,10 @@ const MarkdownRenderer = ({
                   length === 1
                     ? ""
                     : index === 0
-                    ? styles["first-block"]
-                    : index === length - 1
-                    ? styles["last-block"]
-                    : styles["common-block"]
+                      ? styles["first-block"]
+                      : index === length - 1
+                        ? styles["last-block"]
+                        : styles["common-block"],
                 )}
                 components={{
                   code({ node, className, children, ...props }) {
@@ -138,10 +142,10 @@ const MarkdownRenderer = ({
               length === 1
                 ? ""
                 : index === 0
-                ? styles["first-block"]
-                : index === length - 1
-                ? styles["last-block"]
-                : styles["common-block"]
+                  ? styles["first-block"]
+                  : index === length - 1
+                    ? styles["last-block"]
+                    : styles["common-block"],
             )}
             components={{
               code({ node, className, children, ...props }) {
