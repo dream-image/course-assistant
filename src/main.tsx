@@ -7,7 +7,11 @@ import { ConfigProvider } from "antd";
 import zhCN from "antd/locale/zh_CN";
 createRoot(document.getElementById("root")!).render(
   <HeroUIProvider>
-    <ConfigProvider locale={zhCN}>
+    <ConfigProvider
+      locale={zhCN}
+      prefixCls="course-assistant"
+      iconPrefixCls="course-assistant-icon"
+    >
       <App />
     </ConfigProvider>
   </HeroUIProvider>,
