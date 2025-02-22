@@ -1,6 +1,6 @@
 import Logo from "@/assets/404.svg";
 import { setToken } from "@/utils";
-import { Button, Image } from "@nextui-org/react";
+import { Button, Image } from "@heroui/react";
 import { useNavigate } from "react-router-dom";
 export default function NotFound() {
   const navigate = useNavigate();

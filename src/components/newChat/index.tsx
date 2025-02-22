@@ -1,4 +1,4 @@
-import { cn } from "@nextui-org/react";
+import { cn } from "@heroui/react";
 import styles from "./style.module.css";
 type Props = {
   children?: React.ReactNode;

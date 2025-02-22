@@ -1,5 +1,4 @@
 import { getToken } from "@/utils";
-import { message } from "antd";
 import axios from "axios";
 export type BaseResponse<T> = {
   result: number;
@@ -23,11 +22,10 @@ request.interceptors.response.use(
     if (response.data?.result !== 1) {
       return Promise.reject(response.data);
     }
-
     return response;
   },
   function (error) {
-    return Promise.reject(error);
+    return Promise.reject(error?.response?.data||error);
   },
 );
 export const get = async <T>(

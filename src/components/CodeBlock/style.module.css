@@ -56,13 +56,25 @@
   transition: 0.3s;
   transform: scale(0.93);
 }
-.error-block{
-  background-color: #f8d7da;
-  color: #721c24;
-  padding: 10px;
-  border-radius: 5px;
-  margin-bottom: 10px;
-  font-size: 14px;
-  line-height: 1.5;
-  text-align: center;
+
+.markdown-wrapper{
+  :global(pre:not([class*="style-yes"])){
+    padding: 0;
+    border: none;
+  }
+}
+.first-block{
+  border-bottom-right-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
+  border-bottom: none !important;
+}
+.last-block{
+  border-top-right-radius: 0 !important;
+  border-top-left-radius: 0 !important;
+  border-top: none !important;
+}
+.common-block{
+  border-radius: 0 !important;
+  border-top: none !important;
+  border-bottom: none !important;
 }

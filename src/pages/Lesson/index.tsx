@@ -21,7 +21,8 @@ import {
   Tabs,
   Breadcrumbs,
   BreadcrumbItem,
-} from "@nextui-org/react";
+  cn,
+} from "@heroui/react";
 import { forwardRef, useContext, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import InfiniteScroll from "@/components/InfiniteScroll";
@@ -49,12 +50,13 @@ const LessonCard = forwardRef(
     return (
       <Card
         isFooterBlurred
-        className="border-none relative min-w-[300px] max-w-[370px] h-[200px] overflow-visible flex-1"
+        className={cn("border-none relative min-w-[300px] max-w-[370px] h-[200px] overflow-visible flex-1",styles.lessonCard)}
         radius="lg"
+        
       >
         <Image
           alt={name}
-          className=" bg-contain hover:cursor-pointer min-w-[300px] flex-1"
+          className=" bg-cover hover:cursor-pointer w-full flex-1"
           height={200}
           src={`${REQUEST_BASE_URL}/cover/${cover}`}
           onClick={() => {

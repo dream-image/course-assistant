@@ -1,5 +1,5 @@
 import welcome from "@/assets/欢迎.svg";
-import { Button, Image, Input, Link } from "@nextui-org/react";
+import { Button, Image, Input, Link } from "@heroui/react";
 import { useNavigate } from "react-router-dom";
 import Background from "@/assets/背景图.jpg";
 import { useContext, useEffect, useRef, useState } from "react";

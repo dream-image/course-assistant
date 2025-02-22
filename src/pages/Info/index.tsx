@@ -8,7 +8,7 @@ import {
   Image,
   Tab,
   Tabs,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { useContext, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import image from "@/assets/头像.png";

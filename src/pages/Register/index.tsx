@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Input, Button, CardBody, Card } from "@nextui-org/react";
+import { Input, Button, CardBody, Card } from "@heroui/react";
 import { Form } from "antd"; // Use antd Card instead
 
 const Register: React.FC = () => {

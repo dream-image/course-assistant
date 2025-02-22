@@ -1,4 +1,3 @@
-import { ScrollNumberProps } from "antd/lib/badge";
 
 export type LoginInfo = {
   username?: string;
@@ -34,12 +33,14 @@ export type LessonType = {
   id: number;
   lessonId: number;
   name: string;
-  createTime: ScrollNumberProps;
+  createTime: number;
   ownerId: number;
   status: LessonStatus;
   startTime: number;
   endTime: number;
   teacherName: string;
+  //学院
+  college:string;
   //封面图片文件名称
   cover: string;
 };
@@ -66,4 +67,14 @@ export interface Modal {
   version: string;
   url: string;
   name: string;
+}
+
+export interface UpdateLessonParams{
+  lessonId: number;
+  name: string;
+  createTime: number;
+  startTime: number;
+  endTime: number;
+  teacherName: string;
+  college:string;
 }

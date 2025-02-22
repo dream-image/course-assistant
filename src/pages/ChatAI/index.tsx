@@ -3,12 +3,10 @@ import { useXAgent, useXChat, Sender, Bubble } from "@ant-design/x";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { message, Space, Typography } from "antd";
 import styles from "./style.module.css";
-import { Button, Card, CardBody } from "@nextui-org/react";
+import { Button, Card, CardBody, Alert } from "@heroui/react";
 import { useNavigate, useParams } from "react-router-dom";
 import { isNaN, isUndefined } from "lodash-es";
 import { LessonType, Modal } from "@/api/type";
-import hljs from "highlight.js";
-import "highlight.js/styles/tokyo-night-dark.min.css";
 import { BubbleListProps } from "@ant-design/x/es/bubble/BubbleList";
 import {
   CopyOutlined,
@@ -17,9 +15,9 @@ import {
   UpOutlined,
 } from "@ant-design/icons";
 import { getToken } from "@/utils";
-import markdownit from "markdown-it";
 import CustomeButtonRadioGroup from "@/components/Radio";
 import NewChat from "@/components/newChat";
+import MarkdownRenderer from "@/components/CodeBlock";
 const enum AbnormalState {
   LOADING = "loading",
   ERROR = "error",
@@ -54,64 +52,7 @@ const abnormalState: { type: AbnormalState; style?: React.CSSProperties }[] = [
     },
   },
 ];
-const md = markdownit({
-  html: true,
-  breaks: true,
-});
-md.renderer.rules.fence = (tokens, idx) => {
-  const content = tokens[idx].content;
-  const lang = tokens[idx].info;
-  let hlContent = content;
-  if (lang && hljs.getLanguage(lang)) {
-    try {
-      hlContent = hljs.highlight(content, { language: lang }).value;
-    } catch (err) {
-      console.log("err", err);
-    }
-  }
 
-  return `
-   <div class="${styles["code-block-wrapper"]} bg-[#181d28] text-slate-50 flex flex-col ring-inset ring-1 ring-offset-cyan-100 rounded-lg overflow-hidden">
-  <div class=" flex justify-between items-center pl-3 bg-[#50505a]">
-  <span>${lang}</span>
-    <button class="copy-button flex items-center ${styles["copy-button"]}" data-clipboard-text="\`${content}\`">
-    <svg
-    viewBox="0 0 24 24"
-    height="12"
-    width="12"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <g fill="none">
-      <path
-        d="m12.594 23.258l-.012.002l-.071.035l-.02.004l-.014-.004l-.071-.036q-.016-.004-.024.006l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427q-.004-.016-.016-.018m.264-.113l-.014.002l-.184.093l-.01.01l-.003.011l.018.43l.005.012l.008.008l.201.092q.019.005.029-.008l.004-.014l-.034-.614q-.005-.019-.02-.022m-.715.002a.02.02 0 0 0-.027.006l-.006.014l-.034.614q.001.018.017.024l.015-.002l.201-.093l.01-.008l.003-.011l.018-.43l-.003-.012l-.01-.01z"
-      ></path>
-      <path
-        d="M9.107 5.448c.598-1.75 3.016-1.803 3.725-.159l.06.16l.807 2.36a4 4 0 0 0 2.276 2.411l.217.081l2.36.806c1.75.598 1.803 3.016.16 3.725l-.16.06l-2.36.807a4 4 0 0 0-2.412 2.276l-.081.216l-.806 2.361c-.598 1.75-3.016 1.803-3.724.16l-.062-.16l-.806-2.36a4 4 0 0 0-2.276-2.412l-.216-.081l-2.36-.806c-1.751-.598-1.804-3.016-.16-3.724l.16-.062l2.36-.806A4 4 0 0 0 8.22 8.025l.081-.216zM11 6.094l-.806 2.36a6 6 0 0 1-3.49 3.649l-.25.091l-2.36.806l2.36.806a6 6 0 0 1 3.649 3.49l.091.25l.806 2.36l.806-2.36a6 6 0 0 1 3.49-3.649l.25-.09l2.36-.807l-2.36-.806a6 6 0 0 1-3.649-3.49l-.09-.25zM19 2a1 1 0 0 1 .898.56l.048.117l.35 1.026l1.027.35a1 1 0 0 1 .118 1.845l-.118.048l-1.026.35l-.35 1.027a1 1 0 0 1-1.845.117l-.048-.117l-.35-1.026l-1.027-.35a1 1 0 0 1-.118-1.845l.118-.048l1.026-.35l.35-1.027A1 1 0 0 1 19 2"
-        fill="currentColor"
-      ></path>
-    </g>
-  </svg>
-    <span class="${styles["sp"]}">复制</span>
-    </button>
-  </div>
-    <pre class="hljs language-${lang} border-0 flex-1 m-0" style="margin:0;"><code>${hlContent}</code></pre>
-  </div>
-  `;
-};
-const copy = async (e: MouseEvent) => {
-  //@ts-ignore
-  if (e?.target?.classList.contains("copy-button")) {
-    //@ts-ignore
-    const text = e.target?.dataset?.clipboardText;
-
-    try {
-      await navigator.clipboard.writeText(text);
-      message.success("复制成功!"); // 自定义提示
-    } catch (err) {
-      message.error("复制失败，请手动复制");
-    }
-  }
-};
 const ChatAI: React.FC = () => {
   const bubbleWrapperRef = React.useRef<HTMLDivElement>(null);
   const params = useParams();
@@ -146,7 +87,7 @@ const ChatAI: React.FC = () => {
       // scroll to bottom
       bubbleWrapperRef.current?.scrollTo(
         0,
-        bubbleWrapperRef.current?.scrollHeight,
+        bubbleWrapperRef.current?.scrollHeight
       );
       const controller = new AbortController();
       controllerRef.current = controller;
@@ -179,19 +120,21 @@ const ChatAI: React.FC = () => {
               onUpdate(AbnormalState.OVER_TIME);
               onSuccess(AbnormalState.OVER_TIME);
               setValue(_message);
+              bubbleWrapperRef.current?.scrollTo(
+                0,
+                bubbleWrapperRef.current?.scrollHeight
+              );
               messageRef.current = undefined;
               break;
             }
             onSuccess(buffer);
             break;
           }
+
           // 解码并处理数据块
           buffer += decoder.decode(value, { stream: true });
           messageRef.current = buffer;
-          bubbleWrapperRef.current?.scrollTo(
-            0,
-            bubbleWrapperRef.current?.scrollHeight,
-          );
+          console.log("value", buffer);
           onUpdate(buffer);
         }
         console.log("流接收完成");
@@ -199,18 +142,20 @@ const ChatAI: React.FC = () => {
         setValue(_message);
         let msg = error?.message || error?.error_msg || error;
         if (error?.name === "AbortError") {
-          msg = `${
-            messageRef.current
-              ? "> " + messageRef.current + "\n\n" + AbnormalState.STOP
-              : AbnormalState.STOP
-          }`;
+          msg =
+            messageRef.current +
+            `<error-3ee1a747-f116-11ef-ae3b-00163e0e374c>${AbnormalState.STOP}</error-3ee1a747-f116-11ef-ae3b-00163e0e374c>`;
         } else {
-          msg = `${
-            messageRef.current ? "> " + messageRef.current + "\n\n" + msg : msg
-          }`;
+          msg =
+            messageRef.current +
+            `<error-3ee1a747-f116-11ef-ae3b-00163e0e374c>${msg}</error-3ee1a747-f116-11ef-ae3b-00163e0e374c>`;
         }
         messageRef.current = undefined;
         console.error(error);
+        bubbleWrapperRef.current?.scrollTo(
+          0,
+          bubbleWrapperRef.current?.scrollHeight
+        );
         onSuccess(msg);
       }
     },
@@ -226,16 +171,64 @@ const ChatAI: React.FC = () => {
 
   const items: BubbleListProps["items"] = messages.map(
     ({ message: _message, id }, index) => {
+      let thinkContent: any = _message.match(
+        /<think-3ee1a747-f116-11ef-ae3b-00163e0e374c>[\s\S]*?(?=<\/think-3ee1a747-f116-11ef-ae3b-00163e0e374c>|<error-3ee1a747-f116-11ef-ae3b-00163e0e374c>|$)/
+      )?.[0];
+
+      if (thinkContent) {
+        _message = _message.replace(thinkContent, "");
+        _message=_message.replace(/<\/think-3ee1a747-f116-11ef-ae3b-00163e0e374c>/,"")
+        thinkContent = thinkContent.replace(
+          /<think-3ee1a747-f116-11ef-ae3b-00163e0e374c>/,
+          ""
+        );
+
+        thinkContent = thinkContent.replace(
+          /<\/think-3ee1a747-f116-11ef-ae3b-00163e0e374c>/,
+          ""
+        );
+      }
+      let errorContent: any = _message.match(
+        /<error-3ee1a747-f116-11ef-ae3b-00163e0e374c>[\s\S]*?(?:<\/error-3ee1a747-f116-11ef-ae3b-00163e0e374c>|$)/
+      )?.[0];
+      if (errorContent) {
+        _message = _message.replace(errorContent, "");
+        errorContent = errorContent.replace(
+          /<error-3ee1a747-f116-11ef-ae3b-00163e0e374c>/,
+          ""
+        );
+        errorContent = errorContent.replace(
+          /<\/error-3ee1a747-f116-11ef-ae3b-00163e0e374c>/,
+          ""
+        );
+        if (AbnormalState.STOP === errorContent) {
+          errorContent = <Alert color="primary" title={errorContent}></Alert>;
+        } else {
+          errorContent = <Alert color="danger" title={errorContent}></Alert>;
+        }
+      }
+
       return {
         key: id,
         content:
           index % 2 === 1 ? (
             <Typography.Text>
-              <div
-                dangerouslySetInnerHTML={{
-                  __html: md.render(_message),
-                }}
-              />
+              <MarkdownRenderer
+                data={[
+                  {
+                    content: thinkContent,
+                    isThink: true,
+                  },
+                  {
+                    content: _message,
+                    className: "",
+                  },
+                  {
+                    content: errorContent,
+                    className: styles["error-block"],
+                  },
+                ]}
+              ></MarkdownRenderer>
             </Typography.Text>
           ) : (
             <Typography className=" whitespace-pre-wrap break-all">
@@ -296,7 +289,7 @@ const ChatAI: React.FC = () => {
             </>
           ) : undefined,
       };
-    },
+    }
   );
   const init = async () => {
     try {
@@ -330,10 +323,10 @@ const ChatAI: React.FC = () => {
   }, [modal]);
   useEffect(() => {
     init();
-    document.addEventListener("click", copy);
-    return () => {
-      document.removeEventListener("click", copy);
-    };
+    // document.addEventListener("click", copy);
+    // return () => {
+    //   document.removeEventListener("click", copy);
+    // };
   }, []);
   return (
     <div
@@ -371,7 +364,7 @@ const ChatAI: React.FC = () => {
           loading={agent.isRequesting()}
           onCancel={() => {
             controllerRef.current?.abort(
-              messageRef.current || AbnormalState.STOP,
+              messageRef.current || AbnormalState.STOP
             );
           }}
           header={

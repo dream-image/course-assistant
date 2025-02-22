@@ -1,7 +1,7 @@
-import { changeLessonCover, getLessonInfo } from "@/api";
+import { changeLessonCover, getLessonInfo, updateLesson } from "@/api";
 import { LessonType } from "@/api/type";
 import { FileType, getBase64, getToken } from "@/utils";
-import { LoadingOutlined, UploadOutlined } from "@ant-design/icons";
+import { UploadOutlined } from "@ant-design/icons";
 import { ProDescriptions, ProFormItemRender } from "@ant-design/pro-components";
 import {
   Accordion,
@@ -15,7 +15,6 @@ import {
   Chip,
   CircularProgress,
   cn,
-  Divider,
   Modal,
   ModalBody,
   ModalContent,
@@ -24,21 +23,41 @@ import {
   Tab,
   Tabs,
   useDisclosure,
-} from "@nextui-org/react";
-import { Form, Image, message, Upload } from "antd";
+} from "@heroui/react";
+import { Form, Image, message, Upload, Button as AntdButton } from "antd";
 import { isUndefined } from "lodash-es";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import styles from "./style.module.css";
 import { REQUEST_BASE_URL } from "@/common/request";
-const beforeUpload = () => {};
+import dayjs, { Dayjs } from "dayjs";
+import { UploadFile } from "antd/lib";
+
+const beforeUpload = (file: FileType) => {
+  const isJpgOrPng = file.type === "image/jpeg" || file.type === "image/png";
+  if (!isJpgOrPng) {
+    message.error("只支持png和jpeg格式的图片");
+  }
+  const isLt2M = file.size / 1024 / 1024 < 4;
+  if (!isLt2M) {
+    message.error("图片大小必须小于4MB!");
+  }
+  return isJpgOrPng && isLt2M;
+};
 const Manage = () => {
   const [tabKey, setTabKey] = useState<string>("center");
   const navigate = useNavigate();
   const params = useParams();
   const [lesson, setLesson] = useState<LessonType>();
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const { isOpen, onOpen, onOpenChange } = useDisclosure({ id: "cover" });
+  const {
+    isOpen: isFileModalOpen,
+    onOpenChange: onFileModalOpenChange,
+    onOpen: onFileModalOpen,
+    onClose: onFileModalClose,
+  } = useDisclosure({ id: "files" });
   const [isCoverLoading, setIsCoverLoading] = useState<boolean>(false);
+
   const getLesson = async () => {
     try {
       if (isUndefined(params.id) || isNaN(Number(params.id))) {
@@ -59,7 +78,7 @@ const Manage = () => {
     }
   };
   const init = async () => {
-    await getLesson();
+    getLesson();
   };
   useEffect(() => {
     init();
@@ -155,20 +174,40 @@ const Manage = () => {
 
                       <div className="flex-1 flex-col justify-between h-full gap-3">
                         <ProDescriptions
-                          // actionRef={actionRef}
+                          dataSource={lesson}
                           column={1}
                           title=""
-                          request={async () => {
-                            const lesson = await getLesson();
-                            return Promise.resolve({
-                              success: true,
-                              data: {
-                                ...lesson,
-                              },
-                            });
-                          }}
                           editable={{
-                            onSave: async (keypath, newInfo, oriInfo) => {},
+                            onSave: async (keypath, newInfo, oriInfo) => {
+                              try {
+                                const {
+                                  lessonId,
+                                  createTime,
+                                  startTime,
+                                  endTime,
+                                  teacherName,
+                                  name,
+                                  college,
+                                } = newInfo;
+                                await updateLesson({
+                                  lessonId,
+                                  createTime: dayjs(createTime).valueOf(),
+                                  startTime: dayjs(startTime).valueOf(),
+                                  endTime: dayjs(endTime).valueOf(),
+                                  teacherName,
+                                  name,
+                                  college,
+                                });
+                                message.success("更新成功");
+                                await getLesson();
+                                return Promise.resolve();
+                              } catch (error: any) {
+                                console.log("error", error);
+
+                                message.error(error?.error_msg || "修改失败");
+                                return false;
+                              }
+                            },
                           }}
                         >
                           <ProDescriptions.Item
@@ -181,12 +220,12 @@ const Manage = () => {
                                   validator: (_, value) => {
                                     if (value.length < 1) {
                                       return Promise.reject(
-                                        "昵称长度不得小于1",
+                                        "昵称长度不得小于1"
                                       );
                                     }
-                                    if (value.length > 40) {
+                                    if (value.length > 20) {
                                       return Promise.reject(
-                                        "昵称长度不得大于40",
+                                        "昵称长度不得大于20"
                                       );
                                     }
                                     return Promise.resolve();
@@ -205,11 +244,34 @@ const Manage = () => {
                             label="开始时间"
                             dataIndex={["startTime"]}
                             valueType="date"
+                            fieldProps={{
+                              name: "startTime",
+                              format: "YYYY-MM-DD HH:mm",
+                              showTime: { format: "HH:mm" },
+
+                              disabledDate: (current: Dayjs) => {
+                                if (current < dayjs().startOf("day")) {
+                                  return true;
+                                }
+                                return false;
+                              },
+                            }}
                           />
                           <ProDescriptions.Item
                             label="结束时间"
                             dataIndex={["endTime"]}
                             valueType="date"
+                            fieldProps={{
+                              name: "endTime",
+                              format: "YYYY-MM-DD HH:mm",
+                              showTime: { format: "HH:mm" },
+                              disabledDate: (current: Dayjs) => {
+                                if (current < dayjs().startOf("day")) {
+                                  return true;
+                                }
+                                return false;
+                              },
+                            }}
                           />
                           <ProDescriptions.Item
                             label="开课学院"
@@ -223,7 +285,22 @@ const Manage = () => {
                   <AccordionItem
                     key="2"
                     aria-label="课程资料"
-                    title="课程资料"
+                    title={
+                      <div className=" flex justify-start gap-3">
+                        <div>课程资料</div>
+                        <Button
+                          className=" h-7 "
+                          size="sm"
+                          variant="ghost"
+                          color="primary"
+                          onClick={() => {
+                            onFileModalOpen();
+                          }}
+                        >
+                          新增 +
+                        </Button>
+                      </div>
+                    }
                   ></AccordionItem>
                   <AccordionItem
                     key="3"
@@ -236,7 +313,7 @@ const Manage = () => {
           )}
         </Card>
       </div>
-      {/* 悬浮层预留位 */}
+      {/* 下面是悬浮层 */}
       <>
         <Modal isOpen={isOpen} onOpenChange={onOpenChange} size="3xl">
           <ModalContent>
@@ -308,7 +385,7 @@ const Manage = () => {
                                     (url) => {
                                       setIsCoverLoading(false);
                                       onChange(url);
-                                    },
+                                    }
                                   );
                                 }
                               }}
@@ -333,6 +410,9 @@ const Manage = () => {
                                     <div className="flex flex-col items-center justify-center">
                                       <UploadOutlined />
                                       <span>上传</span>
+                                      <span className="text-xs text-gray-500">
+                                        （图片只支持png和jpeg格式）
+                                      </span>
                                     </div>
                                   </Chip>
                                 </>
@@ -361,7 +441,70 @@ const Manage = () => {
                           message.success("修改成功");
                           onClose();
                           //刷新信息
-                          init();
+                          await getLesson();
+                        } catch (error: any) {
+                          const msg =
+                            error?.error_msg ||
+                            error?.message ||
+                            "网络错误，请稍后再试";
+                          console.error(error);
+                          message.error(msg);
+                        }
+                      }}
+                    >
+                      确定
+                    </Button>
+                  </ModalFooter>
+                </>
+              );
+            }}
+          </ModalContent>
+        </Modal>
+        <Modal
+          isOpen={isFileModalOpen}
+          onOpenChange={onFileModalOpenChange}
+          size="4xl"
+          onClose={() => {
+            onFileModalClose();
+          }}
+        >
+          <ModalContent>
+            {(onClose) => {
+              return (
+                <>
+                  <ModalHeader>上传文件</ModalHeader>
+                  <ModalBody>
+                    <Upload
+                      multiple
+                      maxCount={5}
+                      listType="picture"
+                      onRemove={(file) => {
+                       
+                      }}
+                      beforeUpload={(file) => {
+                       
+                      }}
+                    >
+                      <AntdButton type="primary" className=" rounded-xl h-10">
+                        <UploadOutlined />
+                        选择文件
+                      </AntdButton>
+                    </Upload>
+                  </ModalBody>
+                  <ModalFooter>
+                    <Button
+                      color="danger"
+                      variant="light"
+                      onPress={() => {
+                      }}
+                    >
+                      取消
+                    </Button>
+                    <Button
+                      color="primary"
+                      onPress={async () => {
+                        try {
+                          () => {};
                         } catch (error: any) {
                           const msg =
                             error?.error_msg ||

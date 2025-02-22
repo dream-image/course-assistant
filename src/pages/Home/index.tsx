@@ -9,7 +9,7 @@ import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { Outlet, useNavigate } from "react-router-dom";
 import background from "@/assets/background.png";
 import image from "@/assets/头像.png";

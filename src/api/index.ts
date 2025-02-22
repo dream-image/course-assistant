@@ -6,6 +6,7 @@ import {
   GetLessonListParams,
   GetLessonListResponse,
   LoginInfo,
+  UpdateLessonParams,
 } from "./type";
 
 export const refreshToken = async () => {
@@ -37,3 +38,7 @@ export const getAiVersions = async (): Promise<GetAiVersionsResponse> => {
 export const changeLessonCover = async (params: { lessonId: number }) => {
   return post("/cover/new/lesson", params);
 };
+
+export const updateLesson = async (params:UpdateLessonParams)=>{
+  return post("/updateLesson", params);
+}
