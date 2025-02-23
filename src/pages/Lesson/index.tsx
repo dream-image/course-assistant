@@ -23,13 +23,20 @@ import {
   BreadcrumbItem,
   cn,
 } from "@heroui/react";
-import { forwardRef, useContext, useEffect, useRef, useState } from "react";
+import {
+  forwardRef,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useNavigate } from "react-router-dom";
 import InfiniteScroll from "@/components/InfiniteScroll";
-import { debounce, pick } from "lodash-es";
+import { debounce, pick, throttle } from "lodash-es";
 import styles from "./style.module.css";
 import dayjs from "dayjs";
-import { message } from "antd";
+import { message, Typography } from "antd";
 import { UserInfoContext } from "@/context/UserInfoContext";
 import { REQUEST_BASE_URL } from "@/common/request";
 const LessonCard = forwardRef(
@@ -47,6 +54,24 @@ const LessonCard = forwardRef(
     const statusInfo = LessonStatusMap[status];
     const [selectedKeys, setSelectedKeys] = useState(new Set(["0"]));
     const navigate = useNavigate();
+    const titleBoxRef = useRef<HTMLDivElement>(null);
+    const [titleWidth, setTitleWidth] = useState(0);
+    const observer = useMemo(() => {
+      return new ResizeObserver(
+        throttle((entries) => {
+          for (const entry of entries) {
+            const { width } = entry.contentRect;
+            setTitleWidth(width);
+          }
+        }, 500),
+      );
+    }, []);
+    useEffect(() => {
+      observer.observe(titleBoxRef.current!);
+      return () => {
+        observer.disconnect();
+      };
+    }, []);
     return (
       <Card
         isFooterBlurred
@@ -111,7 +136,10 @@ const LessonCard = forwardRef(
           </Dropdown>
         </div>
         <CardFooter className="justify-between before:bg-white/10 border-white/20 border-1 overflow-hidden py-1 absolute before:rounded-xl rounded-large bottom-1 w-[calc(100%_-_8px)] shadow-small ml-1 z-10">
-          <div className="text-xs text-white/80 flex-1">
+          <div
+            className="text-xs text-white/80 w-full flex-nowrap  items-center"
+            ref={titleBoxRef}
+          >
             <Chip
               //@ts-ignore
               color={statusInfo.color}
@@ -121,7 +149,18 @@ const LessonCard = forwardRef(
             >
               {statusInfo.text}
             </Chip>
-            <span>{name}</span>
+
+            <Typography.Text
+              className={cn("text-xs text-white/80 -translate-y-1")}
+              style={{
+                width: titleWidth ? titleWidth - 68 : "auto",
+              }}
+              ellipsis={{
+                tooltip: name,
+              }}
+            >
+              {name}
+            </Typography.Text>
           </div>
           <Button
             className="text-tiny text-white bg-black/20"

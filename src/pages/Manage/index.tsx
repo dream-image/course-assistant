@@ -1,5 +1,11 @@
-import { changeLessonCover, getLessonInfo, updateLesson } from "@/api";
-import { LessonType } from "@/api/type";
+import {
+  changeLessonCover,
+  getLessonFileList,
+  getLessonInfo,
+  removeLessonFile,
+  updateLesson,
+} from "@/api";
+import { LessonFile, LessonType } from "@/api/type";
 import { FileType, getBase64, getToken } from "@/utils";
 import { UploadOutlined } from "@ant-design/icons";
 import { ProDescriptions, ProFormItemRender } from "@ant-design/pro-components";
@@ -24,15 +30,23 @@ import {
   Tabs,
   useDisclosure,
 } from "@heroui/react";
-import { Form, Image, message, Upload, Button as AntdButton } from "antd";
+import {
+  Form,
+  Image,
+  message,
+  Upload,
+  Button as AntdButton,
+  Modal as AntdModal,
+} from "antd";
 import { isUndefined } from "lodash-es";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import styles from "./style.module.css";
 import { REQUEST_BASE_URL } from "@/common/request";
 import dayjs, { Dayjs } from "dayjs";
+import LessonFileCard from "@/components/LessonFileCard";
 import { UploadFile } from "antd/lib";
-
+const acceptFileExtension = ["pdf", "ppt", "pptx", "doc", "docx"];
 const beforeUpload = (file: FileType) => {
   const isJpgOrPng = file.type === "image/jpeg" || file.type === "image/png";
   if (!isJpgOrPng) {
@@ -49,6 +63,10 @@ const Manage = () => {
   const navigate = useNavigate();
   const params = useParams();
   const [lesson, setLesson] = useState<LessonType>();
+  const [lessonFiles, setLessonFiles] = useState<LessonFile[]>([]);
+  const [uploadFileListInModal, setUploadFileListInModal] = useState<
+    UploadFile[]
+  >([]);
   const { isOpen, onOpen, onOpenChange } = useDisclosure({ id: "cover" });
   const {
     isOpen: isFileModalOpen,
@@ -77,8 +95,23 @@ const Manage = () => {
       navigate(-1);
     }
   };
+  const getLessonFiles = async () => {
+    try {
+      if (isUndefined(params.id) || isNaN(Number(params.id))) {
+        navigate(-1);
+        return;
+      }
+      const res = await getLessonFileList({ lessonId: Number(params.id) });
+      setLessonFiles(res.data);
+    } catch (error: any) {
+      message.error(
+        error?.error_msg || error?.message || "获取课程文件列表失败",
+      );
+    }
+  };
   const init = async () => {
     getLesson();
+    getLessonFiles();
   };
   useEffect(() => {
     init();
@@ -285,6 +318,9 @@ const Manage = () => {
                   <AccordionItem
                     key="2"
                     aria-label="课程资料"
+                    classNames={{
+                      content: "flex gap-5 flex-wrap",
+                    }}
                     title={
                       <div className=" flex justify-start gap-3">
                         <div>课程资料</div>
@@ -293,7 +329,7 @@ const Manage = () => {
                           size="sm"
                           variant="ghost"
                           color="primary"
-                          onClick={() => {
+                          onPress={() => {
                             onFileModalOpen();
                           }}
                         >
@@ -301,7 +337,18 @@ const Manage = () => {
                         </Button>
                       </div>
                     }
-                  ></AccordionItem>
+                  >
+                    {lessonFiles?.map((i, index) => {
+                      return (
+                        <LessonFileCard
+                          {...i}
+                          key={index}
+                          lesson={lesson}
+                          fileName={i.name}
+                        ></LessonFileCard>
+                      );
+                    })}
+                  </AccordionItem>
                   <AccordionItem
                     key="3"
                     aria-label="学生列表"
@@ -467,35 +514,112 @@ const Manage = () => {
           onClose={() => {
             onFileModalClose();
           }}
+          isDismissable={false}
+          hideCloseButton
         >
           <ModalContent>
             {(onClose) => {
               return (
                 <>
-                  <ModalHeader>上传文件</ModalHeader>
+                  <ModalHeader className="flex items-center">
+                    上传文件
+                    <span className=" text-gray-600  text-sm font-normal">
+                      (一次最多上传5份文件,支持pdf、ppt、pptx、doc、docx类型文件)
+                    </span>
+                  </ModalHeader>
                   <ModalBody>
                     <Upload
                       multiple
                       maxCount={5}
                       listType="picture"
-                      onRemove={(file) => {}}
-                      beforeUpload={(file) => {}}
+                      action={`${REQUEST_BASE_URL}/upload/lesson/file`}
+                      data={{ lessonId: lesson?.lessonId }}
+                      headers={{
+                        Authorization: getToken() || "",
+                      }}
+                      onRemove={async (file) => {
+                        try {
+                          if (file.status === "done") {
+                            await removeLessonFile({
+                              lessonId: lesson!.lessonId,
+                              fileName: file.name,
+                            });
+                            return;
+                          }
+                          if (file.status === "uploading") {
+                            message.error("文件上传中，请稍后再试");
+                            return;
+                          }
+                        } catch (error: any) {
+                          console.log(error);
+                          if (error?.result === 404) {
+                            return;
+                          }
+                          const msg =
+                            error?.error_msg || error?.message || error;
+                          message.error(msg);
+                          return Promise.reject();
+                        }
+                      }}
+                      onChange={(info) => {
+                        setUploadFileListInModal(info.fileList);
+                        const { file } = info;
+                        if (info.file.status === "error") {
+                          const msg =
+                            file.response?.error_msg ||
+                            file.response ||
+                            "网络错误，请稍后再试";
+                          info.file.response = msg;
+                        }
+                      }}
+                      beforeUpload={async (file) => {
+                        if (
+                          uploadFileListInModal.some(
+                            (i) => i.name === file.name,
+                          )
+                        ) {
+                          message.error("文件已在上传列表，请勿重复上传");
+                          return Upload.LIST_IGNORE;
+                        }
+                        const fileExt =
+                          file.name.split(".").pop()?.toLocaleLowerCase() || "";
+                        if (!acceptFileExtension.includes(fileExt)) {
+                          message.error("文件格式不支持");
+
+                          return Upload.LIST_IGNORE;
+                        }
+                        if (lessonFiles.some((i) => i.name === file.name)) {
+                          const res = await new Promise((res, rej) => {
+                            const modal = AntdModal.confirm({
+                              title: "文件已存在，是否覆盖？",
+                              onOk: async () => {
+                                res(true);
+                                modal.destroy();
+                              },
+                              onCancel: async () => {
+                                res(false);
+                                modal.destroy();
+                              },
+                            });
+                          });
+                          if (!res) return Upload.LIST_IGNORE;
+                          return true;
+                        }
+                      }}
                     >
                       <AntdButton type="primary" className=" rounded-xl h-10">
                         <UploadOutlined />
-                        选择文件
+                        上传文件
                       </AntdButton>
                     </Upload>
                   </ModalBody>
                   <ModalFooter>
-                    <Button color="danger" variant="light" onPress={() => {}}>
-                      取消
-                    </Button>
                     <Button
                       color="primary"
                       onPress={async () => {
                         try {
-                          () => {};
+                          await getLessonFiles();
+                          onClose();
                         } catch (error: any) {
                           const msg =
                             error?.error_msg ||

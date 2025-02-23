@@ -2,6 +2,7 @@ import request, { BaseResponse, get, post } from "@/common/request";
 import { UserInfo } from "@/types";
 import {
   GetAiVersionsResponse,
+  GetLessonFileListResponse,
   GetLessonInfoResponse,
   GetLessonListParams,
   GetLessonListResponse,
@@ -41,4 +42,17 @@ export const changeLessonCover = async (params: { lessonId: number }) => {
 
 export const updateLesson = async (params: UpdateLessonParams) => {
   return post("/updateLesson", params);
+};
+
+export const removeLessonFile = async (params: {
+  lessonId: number;
+  fileName: string;
+}) => {
+  return request.delete("/upload/lesson", { params });
+};
+
+export const getLessonFileList = async (params: {
+  lessonId: number;
+}): Promise<GetLessonFileListResponse> => {
+  return get("/upload/lesson", params);
 };

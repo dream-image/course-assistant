@@ -1,0 +1,7 @@
+.scroll {
+  :global(div[data-testid="core__inner-pages"]) {
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+}

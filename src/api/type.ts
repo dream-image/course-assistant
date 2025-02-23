@@ -77,3 +77,11 @@ export interface UpdateLessonParams {
   teacherName: string;
   college: string;
 }
+
+export interface LessonFile {
+  name: string;
+  coverUrl?: string;
+}
+export interface GetLessonFileListResponse {
+  data: LessonFile[];
+}
