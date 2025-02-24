@@ -25,6 +25,7 @@
     "lodash-es": "^4.17.21",
     "pdfjs-dist": "^3.4.120",
     "react": "^18.3.1",
+    "react-doc-viewer": "^0.1.14",
     "react-dom": "^18.3.1",
     "react-markdown": "^9.0.3",
     "react-router-dom": "^6.27.0",

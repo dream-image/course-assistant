@@ -78,11 +78,6 @@ const ChatAI: React.FC = () => {
 
       const { onSuccess, onUpdate } = callbacks;
       onUpdate(AbnormalState.LOADING);
-      // current message
-      console.log("message", _message);
-
-      // history messages
-      console.log("messages", messages);
 
       // scroll to bottom
       bubbleWrapperRef.current?.scrollTo(
@@ -134,7 +129,6 @@ const ChatAI: React.FC = () => {
           // 解码并处理数据块
           buffer += decoder.decode(value, { stream: true });
           messageRef.current = buffer;
-          console.log("value", buffer);
           onUpdate(buffer);
         }
         console.log("流接收完成");

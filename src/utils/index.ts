@@ -1,8 +1,9 @@
-import { refreshToken } from "@/api";
 import { UserInfoContext } from "@/context/UserInfoContext";
 import { GetProp, UploadProps } from "antd";
 import { useContext } from "react";
-
+export const PDFExt = ["pdf"];
+export const WRODExt = ["doc", "docx"];
+export const PPTExt = ["ppt", "pptx"];
 export const getToken = () => {
   return localStorage.getItem("token");
 };

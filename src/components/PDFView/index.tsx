@@ -7,24 +7,50 @@ type Props = {
   className?: string;
   lessonId: number;
   uId: number;
+  fileExt: string;
 };
 
 // 配置 worker（关键修复步骤）
 import * as pdfjs from "pdfjs-dist";
-import { cn } from "@heroui/react";
+import { Alert, cn } from "@heroui/react";
+import { PDFExt } from "@/utils";
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   "pdfjs-dist/build/pdf.worker.min.js",
   import.meta.url,
 ).toString();
 
 const PdfPreview = (props: Props) => {
-  const { fileName, lessonId, uId } = props;
-  const fileUrl = `${REQUEST_BASE_URL}/upload/lesson/${uId}/${lessonId}/${fileName}`;
+  const { lessonId, uId, fileExt } = props;
+  let { fileName } = props;
+  let fileUrl = "";
+  if (!PDFExt.includes(fileExt)) {
+    const fileNameList = fileName.split(".");
+    fileNameList.pop();
+    fileNameList.push("pdf");
+    fileName = fileNameList.join(".");
+    fileUrl = `${REQUEST_BASE_URL}/upload/lesson/${uId}/${
+      lessonId + "-wordToPdf"
+    }/${fileName}`;
+  } else {
+    fileUrl = `${REQUEST_BASE_URL}/upload/lesson/${uId}/${lessonId}/${fileName}`;
+  }
 
   return (
     <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.4.120/build/pdf.worker.min.js">
       <div className={cn(props.className, styles.scroll)}>
-        <Viewer fileUrl={fileUrl} />
+        <Viewer
+          fileUrl={fileUrl}
+          renderError={(err) => {
+            return (
+              <div className="">
+                {" "}
+                <Alert color="danger" className="">
+                  抱歉，格式转化失败，该类型文件暂不支持预览😢
+                </Alert>
+              </div>
+            );
+          }}
+        />
       </div>
     </Worker>
   );

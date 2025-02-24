@@ -56,3 +56,10 @@ export const getLessonFileList = async (params: {
 }): Promise<GetLessonFileListResponse> => {
   return get("/upload/lesson", params);
 };
+
+export const deleteLessonFile = async (params: {
+  lessonId: number;
+  fileName: string;
+}) => {
+  return request.delete("/upload/lesson", { params });
+};

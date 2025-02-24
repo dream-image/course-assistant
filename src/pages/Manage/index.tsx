@@ -236,7 +236,6 @@ const Manage = () => {
                                 return Promise.resolve();
                               } catch (error: any) {
                                 console.log("error", error);
-
                                 message.error(error?.error_msg || "修改失败");
                                 return false;
                               }
@@ -345,6 +344,7 @@ const Manage = () => {
                           key={index}
                           lesson={lesson}
                           fileName={i.name}
+                          refresh={getLessonFiles}
                         ></LessonFileCard>
                       );
                     })}
@@ -619,6 +619,7 @@ const Manage = () => {
                       onPress={async () => {
                         try {
                           await getLessonFiles();
+                          setUploadFileListInModal([]);
                           onClose();
                         } catch (error: any) {
                           const msg =

@@ -24,7 +24,7 @@ const CodeBlock = ({
         ignoreIllegals: true,
       }).value;
     } catch (err) {
-      console.log("Syntax highlighting error:", err);
+      console.error("Syntax highlighting error:", err);
     }
   }
 
@@ -71,7 +71,7 @@ const CodeBlock = ({
           </Button>
         </div>
         <pre
-          className="hljs language-${lang} border-0 flex-1 m-0 style-yes"
+          className="hljs language-${lang} border-0 flex-1 m-0 style-yes text-xs"
           style={{
             margin: 0,
           }}
@@ -120,7 +120,10 @@ const MarkdownRenderer = ({
                   code({ node, className, children, ...props }) {
                     const match = /language-(\w+)/.exec(className || "");
                     return match ? (
-                      <CodeBlock className={className} children={children} />
+                      <CodeBlock
+                        className={cn(className)}
+                        children={children}
+                      />
                     ) : (
                       <code {...props} className={className}>
                         {children}
