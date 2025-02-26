@@ -23,7 +23,6 @@ import {
 import { createPortal } from "react-dom";
 import { useEffect, useRef, useState } from "react";
 import { deleteLessonFile } from "@/api";
-import { PDFExt, PPTExt, WRODExt } from "@/utils";
 type Props = {
   coverUrl?: string;
   fileName: string;
@@ -84,7 +83,7 @@ const LessonFileCard = (props: Props) => {
                   >
                     <DownloadOutlined />
                   </Button>
-                  <Button
+                  {/* <Button
                     isIconOnly
                     variant="light"
                     className=" text-white "
@@ -102,7 +101,7 @@ const LessonFileCard = (props: Props) => {
                         fill="currentColor"
                       ></path>
                     </svg>
-                  </Button>
+                  </Button> */}
                   <Button
                     title="删除文件"
                     isIconOnly
@@ -147,10 +146,17 @@ const LessonFileCard = (props: Props) => {
         </div>
         <Card isFooterBlurred className="border-none" radius="lg">
           <Image
-            alt="Woman listing to music"
-            className="w-full flex-1"
+            className=""
+            classNames={{
+              wrapper: cn(
+                "w-full flex justify-center items-center",
+                styles.maxWidth,
+              ),
+            }}
+            loading="lazy"
             height={112}
-            src={`${REQUEST_BASE_URL}/cover/defaultBackgroundOfLesson.jpg`}
+            src={`${REQUEST_BASE_URL}${coverUrl}`}
+            fallbackSrc={"/src/assets/defaultBgOfLesson.jpg"}
           />
           <CardFooter className="justify-start before:bg-white/10 border-white/20 border-1 overflow-hidden py-1 absolute before:rounded-xl rounded-large bottom-1 w-[calc(100%_-_8px)] shadow-small ml-1 z-10">
             <Typography.Paragraph
@@ -158,7 +164,10 @@ const LessonFileCard = (props: Props) => {
                 tooltip: true,
                 rows: 2,
               }}
-              className={cn("text-tiny text-white/80", styles["mb-0"])}
+              className={cn(
+                "text-tiny text-white/80  invert mix-blend-difference",
+                styles["mb-0"],
+              )}
             >
               {fileName}
             </Typography.Paragraph>

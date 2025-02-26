@@ -1,6 +1,7 @@
 import request, { BaseResponse, get, post } from "@/common/request";
 import { UserInfo } from "@/types";
 import {
+  AddLessonParams,
   GetAiVersionsResponse,
   GetLessonFileListResponse,
   GetLessonInfoResponse,
@@ -22,8 +23,9 @@ export const login = async (params: LoginInfo) => {
 
 export const getLessonList = async (
   params: GetLessonListParams,
+  isCenter?: boolean,
 ): Promise<GetLessonListResponse> => {
-  return get("/lesson/list", params);
+  return get(isCenter ? "/lesson/center/list" : "/lesson/list", params);
 };
 
 export const getLessonInfo = async (
@@ -40,6 +42,9 @@ export const changeLessonCover = async (params: { lessonId: number }) => {
   return post("/cover/new/lesson", params);
 };
 
+export const addLesson = async (params: AddLessonParams) => {
+  return post("/lesson/add", params);
+};
 export const updateLesson = async (params: UpdateLessonParams) => {
   return post("/updateLesson", params);
 };

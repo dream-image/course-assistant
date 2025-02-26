@@ -42,6 +42,9 @@ export type LessonType = {
   college: string;
   //封面图片文件名称
   cover: string;
+  delete: boolean;
+  //是否已选
+  hasChosen?: boolean;
 };
 export interface GetLessonInfoResponse {
   data: {
@@ -67,7 +70,12 @@ export interface Modal {
   url: string;
   name: string;
 }
-
+export interface AddLessonParams {
+  name: string;
+  startTime: number;
+  endTime: number;
+  college: string;
+}
 export interface UpdateLessonParams {
   lessonId: number;
   name: string;

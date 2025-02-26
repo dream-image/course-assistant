@@ -5,6 +5,7 @@ import { HeroUIProvider, Spinner } from "@heroui/react";
 import "animate.css";
 import { ConfigProvider } from "antd";
 import zhCN from "antd/locale/zh_CN";
+import "./index.less";
 createRoot(document.getElementById("root")!).render(
   <HeroUIProvider>
     <ConfigProvider

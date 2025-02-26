@@ -7,6 +7,7 @@ import { UserInfo } from "./types";
 import { getUserInfo } from "./api";
 import { autoRefreshToken } from "./utils/autoRefreshToken";
 import { message } from "antd";
+import { PermissionEnum } from "./common/permission";
 
 function App() {
   const [userInfo, setUserInfo] = useState<UserInfo>({} as UserInfo);
@@ -15,7 +16,16 @@ function App() {
     try {
       setIsLoading(true);
       const res = await getUserInfo();
-      setUserInfo({ ...res.data, hasLogin: true });
+      setUserInfo({
+        ...res.data,
+        permissions: [
+          PermissionEnum.CHAT,
+          PermissionEnum.MANAGE_LESSON,
+          PermissionEnum.UPLOAD_FILE,
+          PermissionEnum.CREATE_LESSON,
+        ],
+        hasLogin: true,
+      });
       console.log("已登录");
       autoRefreshToken();
     } catch (error: any) {

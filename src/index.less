@@ -1,0 +1,13 @@
+@ant-preifx: course-assistant;
+
+:global(.inputSuffix) {
+  :global(.course-assistant-input-suffix) {
+    visibility: hidden;
+  }
+
+  &:not(:has(input[value=""])):hover {
+    :global(.course-assistant-input-suffix) {
+      visibility: visible;
+    }
+  }
+}

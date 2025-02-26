@@ -6,7 +6,7 @@ import {
   updateLesson,
 } from "@/api";
 import { LessonFile, LessonType } from "@/api/type";
-import { FileType, getBase64, getToken } from "@/utils";
+import { FileType, getBase64, getToken, stop } from "@/utils";
 import { UploadOutlined } from "@ant-design/icons";
 import { ProDescriptions, ProFormItemRender } from "@ant-design/pro-components";
 import {
@@ -28,6 +28,7 @@ import {
   ModalHeader,
   Tab,
   Tabs,
+  Tooltip,
   useDisclosure,
 } from "@heroui/react";
 import {
@@ -41,7 +42,7 @@ import {
 import { isUndefined } from "lodash-es";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import styles from "./style.module.css";
+import styles from "./style.module.less";
 import { REQUEST_BASE_URL } from "@/common/request";
 import dayjs, { Dayjs } from "dayjs";
 import LessonFileCard from "@/components/LessonFileCard";
@@ -63,6 +64,7 @@ const Manage = () => {
   const navigate = useNavigate();
   const params = useParams();
   const [lesson, setLesson] = useState<LessonType>();
+  const [isLoading, setIsLoading] = useState(false);
   const [lessonFiles, setLessonFiles] = useState<LessonFile[]>([]);
   const [uploadFileListInModal, setUploadFileListInModal] = useState<
     UploadFile[]
@@ -97,8 +99,10 @@ const Manage = () => {
   };
   const getLessonFiles = async () => {
     try {
+      setIsLoading(true);
       if (isUndefined(params.id) || isNaN(Number(params.id))) {
         navigate(-1);
+        setIsLoading(false);
         return;
       }
       const res = await getLessonFileList({ lessonId: Number(params.id) });
@@ -108,6 +112,7 @@ const Manage = () => {
         error?.error_msg || error?.message || "获取课程文件列表失败",
       );
     }
+    setIsLoading(false);
   };
   const init = async () => {
     getLesson();
@@ -246,6 +251,9 @@ const Manage = () => {
                             dataIndex={["name"]}
                             label="课程名称"
                             valueType="text"
+                            fieldProps={{
+                              className: "inputSuffix",
+                            }}
                             formItemProps={{
                               rules: [
                                 {
@@ -309,6 +317,9 @@ const Manage = () => {
                             label="开课学院"
                             dataIndex={["college"]}
                             valueType="text"
+                            fieldProps={{
+                              className: "inputSuffix",
+                            }}
                           />
                         </ProDescriptions>
                       </div>
@@ -323,31 +334,42 @@ const Manage = () => {
                     title={
                       <div className=" flex justify-start gap-3">
                         <div>课程资料</div>
-                        <Button
-                          className=" h-7 "
-                          size="sm"
-                          variant="ghost"
+                        <Tooltip
+                          content="最多允许20份课程资料"
+                          showArrow={true}
                           color="primary"
-                          onPress={() => {
-                            onFileModalOpen();
-                          }}
+                          closeDelay={100}
                         >
-                          新增 +
-                        </Button>
+                          <Button
+                            className=" h-7 "
+                            size="sm"
+                            variant="ghost"
+                            color="primary"
+                            onPress={() => {
+                              onFileModalOpen();
+                            }}
+                          >
+                            新增 +
+                          </Button>
+                        </Tooltip>
                       </div>
                     }
                   >
-                    {lessonFiles?.map((i, index) => {
-                      return (
-                        <LessonFileCard
-                          {...i}
-                          key={index}
-                          lesson={lesson}
-                          fileName={i.name}
-                          refresh={getLessonFiles}
-                        ></LessonFileCard>
-                      );
-                    })}
+                    {isLoading ? (
+                      <CircularProgress aria-label="Loading..." />
+                    ) : (
+                      lessonFiles?.map((i, index) => {
+                        return (
+                          <LessonFileCard
+                            {...i}
+                            key={index}
+                            lesson={lesson}
+                            fileName={i.name}
+                            refresh={getLessonFiles}
+                          ></LessonFileCard>
+                        );
+                      })
+                    )}
                   </AccordionItem>
                   <AccordionItem
                     key="3"
@@ -544,6 +566,7 @@ const Manage = () => {
                               lessonId: lesson!.lessonId,
                               fileName: file.name,
                             });
+                            getLessonFiles();
                             return;
                           }
                           if (file.status === "uploading") {
@@ -618,7 +641,7 @@ const Manage = () => {
                       color="primary"
                       onPress={async () => {
                         try {
-                          await getLessonFiles();
+                          getLessonFiles();
                           setUploadFileListInModal([]);
                           onClose();
                         } catch (error: any) {

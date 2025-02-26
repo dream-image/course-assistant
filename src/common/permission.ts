@@ -1,0 +1,6 @@
+export enum PermissionEnum {
+  MANAGE_LESSON = "MANAGE_LESSON",
+  CREATE_LESSON = "CREATE_LESSON",
+  UPLOAD_FILE = "UPLOAD_FILE",
+  CHAT = "CHAT",
+}

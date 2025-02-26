@@ -6,4 +6,5 @@ export type UserInfo = {
   role: string;
   userid: number;
   sex: number;
+  permissions: string[];
 };

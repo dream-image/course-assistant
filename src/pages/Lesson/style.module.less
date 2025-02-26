@@ -1,0 +1,86 @@
+@import "/src/index.less";
+
+.scroll {
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  min-height: 40px;
+}
+
+.accordionItem {
+  button {
+    padding: 0;
+  }
+}
+
+.lessonCard > div {
+  max-width: none !important;
+}
+
+:global {
+  @keyframes fadeIn {
+    0% {
+      opacity: 0;
+    }
+    10% {
+      opacity: 0.2;
+    }
+    20% {
+      opacity: 0.4;
+    }
+    30% {
+      opacity: 0.6;
+    }
+    40% {
+      opacity: 0.4;
+    }
+    50% {
+      opacity: 1;
+    }
+    60% {
+      opacity: 0.8;
+    }
+    70% {
+      opacity: 0.6;
+    }
+    80% {
+      opacity: 0.4;
+    }
+    90% {
+      opacity: 0.2;
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+  }
+
+  // .animation {
+
+  //   animation: fadeIn 2s infinite;
+  // }
+
+  .animation-delay-1 {
+    transition: all 3s ease-in-out;
+    animation: fadeIn 3s infinite;
+    animation-delay: 1s;
+  }
+
+  .animation-delay-2 {
+    transition: all 3s ease-in-out;
+    animation: fadeIn 3s infinite;
+    animation-delay: 2s;
+  }
+
+  .animation-delay-3 {
+    transition: all 3s ease-in-out;
+    animation: fadeIn 3s infinite;
+    animation-delay: 3s;
+  }
+
+  // .animation-delay-4 {
+  //   animation: fadeIn 1.6s infinite;
+  //   animation-delay: 1.6s;
+  // }
+}

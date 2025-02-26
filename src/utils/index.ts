@@ -26,3 +26,10 @@ export const getBase64 = (img: FileType, callback: (url: string) => void) => {
   reader.addEventListener("load", () => callback(reader.result as string));
   reader.readAsDataURL(img);
 };
+export const stop = async (time: number) => {
+  return new Promise((res) => {
+    setTimeout(() => {
+      res(true);
+    }, time * 1000);
+  });
+};

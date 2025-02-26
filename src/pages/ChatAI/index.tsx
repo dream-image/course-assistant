@@ -18,6 +18,7 @@ import { getToken } from "@/utils";
 import CustomeButtonRadioGroup from "@/components/Radio";
 import NewChat from "@/components/newChat";
 import MarkdownRenderer from "@/components/CodeBlock";
+import { REQUEST_BASE_URL } from "@/common/request";
 const enum AbnormalState {
   LOADING = "loading",
   ERROR = "error",
@@ -63,7 +64,7 @@ const ChatAI: React.FC = () => {
   const [modalList, setModalList] = useState<Modal[]>([]);
   const [modal, setModal] = useState<Modal>();
   const modalRef = useRef<string>();
-  const messageRef = useRef<string>();
+  const messageRef = useRef<string>("");
   const [modalBarVisible, setModalBarVisible] = useState(true);
   const defaultModalName = useMemo(() => {
     const currentDefalut = localStorage.getItem("defaultModalName");
@@ -78,6 +79,9 @@ const ChatAI: React.FC = () => {
 
       const { onSuccess, onUpdate } = callbacks;
       onUpdate(AbnormalState.LOADING);
+      // current message
+
+      // history messages
 
       // scroll to bottom
       bubbleWrapperRef.current?.scrollTo(
@@ -88,7 +92,7 @@ const ChatAI: React.FC = () => {
       controllerRef.current = controller;
 
       try {
-        const response = await fetch("http://localhost:8888/chat", {
+        const response = await fetch(`${REQUEST_BASE_URL}/chat`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -101,6 +105,16 @@ const ChatAI: React.FC = () => {
             modalName: modalRef.current,
           }),
         });
+        if (response.status > 300) {
+          let text = "";
+          try {
+            text = await response.json();
+          } catch (error) {
+            text = response.statusText;
+          }
+          await Promise.reject(text);
+        }
+        console.log("response开始生产信息");
 
         //@ts-ignore
         const reader = response?.body.getReader();
@@ -110,6 +124,7 @@ const ChatAI: React.FC = () => {
         // 循环读取流
         while (true) {
           const { done, value } = await reader.read();
+
           if (done) {
             if (!buffer) {
               onUpdate(AbnormalState.OVER_TIME);
@@ -119,7 +134,7 @@ const ChatAI: React.FC = () => {
                 0,
                 bubbleWrapperRef.current?.scrollHeight,
               );
-              messageRef.current = undefined;
+              messageRef.current = "";
               break;
             }
             onSuccess(buffer);
@@ -131,10 +146,12 @@ const ChatAI: React.FC = () => {
           messageRef.current = buffer;
           onUpdate(buffer);
         }
-        console.log("流接收完成");
+        messageRef.current = "";
       } catch (error: any) {
         setValue(_message);
         let msg = error?.message || error?.error_msg || error;
+        console.log("msg", msg, error);
+
         if (error?.name === "AbortError") {
           msg =
             messageRef.current +
@@ -144,7 +161,7 @@ const ChatAI: React.FC = () => {
             messageRef.current +
             `<error-3ee1a747-f116-11ef-ae3b-00163e0e374c>${msg}</error-3ee1a747-f116-11ef-ae3b-00163e0e374c>`;
         }
-        messageRef.current = undefined;
+        messageRef.current = "";
         console.error(error);
         bubbleWrapperRef.current?.scrollTo(
           0,

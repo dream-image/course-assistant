@@ -13,7 +13,6 @@ type Props = {
 // 配置 worker（关键修复步骤）
 import * as pdfjs from "pdfjs-dist";
 import { Alert, cn } from "@heroui/react";
-import { PDFExt } from "@/utils";
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   "pdfjs-dist/build/pdf.worker.min.js",
   import.meta.url,
@@ -23,17 +22,13 @@ const PdfPreview = (props: Props) => {
   const { lessonId, uId, fileExt } = props;
   let { fileName } = props;
   let fileUrl = "";
-  if (!PDFExt.includes(fileExt)) {
-    const fileNameList = fileName.split(".");
-    fileNameList.pop();
-    fileNameList.push("pdf");
-    fileName = fileNameList.join(".");
-    fileUrl = `${REQUEST_BASE_URL}/upload/lesson/${uId}/${
-      lessonId + "-wordToPdf"
-    }/${fileName}`;
-  } else {
-    fileUrl = `${REQUEST_BASE_URL}/upload/lesson/${uId}/${lessonId}/${fileName}`;
-  }
+  const fileNameList = fileName.split(".");
+  fileNameList.pop();
+  fileNameList.push("pdf");
+  fileName = fileNameList.join(".");
+  fileUrl = `${REQUEST_BASE_URL}/upload/lesson/${uId}/${
+    lessonId + "-pdf"
+  }/${fileName}`;
 
   return (
     <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.4.120/build/pdf.worker.min.js">
