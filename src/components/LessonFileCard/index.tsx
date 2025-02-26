@@ -54,7 +54,7 @@ const LessonFileCard = (props: Props) => {
   return (
     <>
       <div
-        className=" group w-40 h-28 shadow-2xl rounded-lg transition-all duration-300 ease-in-out flex-grow max-w-[200px] relative"
+        className=" group w-40 h-28 shadow-2xl rounded-lg transition-all duration-300 ease-in-out flex-grow max-w-[200px] relative animate-opacity"
         ref={wrapperRef}
       >
         <div className="absolute w-full h-full opacity-70 hidden group-hover:block bg-black  rounded-xl z-[40]">

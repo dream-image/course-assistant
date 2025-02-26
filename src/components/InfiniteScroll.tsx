@@ -135,7 +135,7 @@ export default class InfiniteScroll extends Component<Props, State> {
             this.props.next && this.props.next();
           }
         }).bind(this),
-        5000,
+        1000,
       );
     }
 

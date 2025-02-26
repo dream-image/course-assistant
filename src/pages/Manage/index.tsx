@@ -47,6 +47,7 @@ import { REQUEST_BASE_URL } from "@/common/request";
 import dayjs, { Dayjs } from "dayjs";
 import LessonFileCard from "@/components/LessonFileCard";
 import { UploadFile } from "antd/lib";
+import LoaderAnimation from "@/components/LoaderAnimation";
 const acceptFileExtension = ["pdf", "ppt", "pptx", "doc", "docx"];
 const beforeUpload = (file: FileType) => {
   const isJpgOrPng = file.type === "image/jpeg" || file.type === "image/png";
@@ -356,7 +357,7 @@ const Manage = () => {
                     }
                   >
                     {isLoading ? (
-                      <CircularProgress aria-label="Loading..." />
+                      <LoaderAnimation></LoaderAnimation>
                     ) : (
                       lessonFiles?.map((i, index) => {
                         return (
