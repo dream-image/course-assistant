@@ -1,7 +1,12 @@
-import { addLesson, getLessonList } from "@/api";
+import { addLesson, deleteLesson, getLessonList, joinLesson } from "@/api";
 import { LessonStatus, LessonStatusMap, LessonType } from "@/api/type";
-import { EllipsisOutlined, SearchOutlined } from "@ant-design/icons";
-import Logo from "/src/assets/logo.svg";
+import {
+  CloseSquareOutlined,
+  DeleteOutlined,
+  EllipsisOutlined,
+  ExclamationCircleOutlined,
+  SearchOutlined,
+} from "@ant-design/icons";
 import {
   Accordion,
   AccordionItem,
@@ -43,7 +48,7 @@ import InfiniteScroll from "@/components/InfiniteScroll";
 import { debounce, isLength, pick, throttle } from "lodash-es";
 import styles from "./style.module.less";
 import dayjs from "dayjs";
-import { Col, message, Row, Space, Typography } from "antd";
+import { Col, message, Row, Space, Typography, Modal as AntdModal } from "antd";
 import { UserInfoContext } from "@/context/UserInfoContext";
 import { REQUEST_BASE_URL } from "@/common/request";
 import { UserInfo } from "@/types";
@@ -54,7 +59,6 @@ import {
   ProFormInstance,
   ProFormText,
 } from "@ant-design/pro-components";
-import { stop } from "@/utils";
 import LoaderAnimation from "@/components/LoaderAnimation";
 
 export enum ETab {
@@ -68,6 +72,10 @@ const LessonCard = forwardRef(
       isShowManage?: boolean;
       tabKey: ETab;
       userInfo: UserInfo;
+      setList: (value: LessonType[]) => void;
+      lessonList: LessonType[];
+      refresh: () => Promise<void>;
+      index: number;
     },
     ref,
   ) => {
@@ -83,12 +91,21 @@ const LessonCard = forwardRef(
       cover,
       tabKey,
       userInfo,
+      ownerId,
+      setList,
+      lessonList,
+      refresh,
+      index,
     } = props;
     const statusInfo = LessonStatusMap[status];
     const [selectedKeys, setSelectedKeys] = useState(new Set(["0"]));
     const navigate = useNavigate();
     const titleBoxRef = useRef<HTMLDivElement>(null);
     const [titleWidth, setTitleWidth] = useState(0);
+    const [isDeleteLoading, setIsDeleteLoading] = useState(false);
+    const [isDeleteDisabled, setIsDeleteDisabled] = useState(true);
+    const [isJoinLoading, setIsJoinLoading] = useState(false);
+    const { isOpen, onOpen, onOpenChange } = useDisclosure();
     const observer = useMemo(() => {
       return new ResizeObserver(
         throttle((entries) => {
@@ -106,159 +123,251 @@ const LessonCard = forwardRef(
       };
     }, []);
     return (
-      <Card
-        isFooterBlurred
-        className={cn(
-          "border-none relative min-w-[300px] max-w-[370px] h-[200px] overflow-visible flex-1 animate-opacity",
-          styles.lessonCard,
-        )}
-        radius="lg"
-      >
-        <Image
-          alt={name}
-          className=" bg-cover hover:cursor-pointer w-full flex-1"
-          height={200}
-          isZoomed
-          src={`${REQUEST_BASE_URL}/cover/${cover}`}
-          fallbackSrc={"/src/assets/defaultBgOfLesson.jpg"}
-          onClick={() => {
-            setSelectedKeys(selectedKeys.has("1") ? new Set() : new Set("1"));
-          }}
-        />
-        <Accordion
-          className=" absolute z-10 top-0"
-          selectedKeys={selectedKeys}
-          //@ts-ignore
-          onSelectionChange={setSelectedKeys}
+      <>
+        <Card
+          isFooterBlurred
+          className={cn(
+            "border-none relative min-w-[300px] max-w-[370px] h-[200px] overflow-visible flex-1 animate-opacity",
+            styles.lessonCard,
+          )}
+          radius="lg"
         >
-          <AccordionItem
-            key="1"
-            aria-label="1"
-            startContent={<span className="text-xs text-white/80">详情</span>}
-            indicator={<></>}
-            className={`${styles.accordionItem} `}
+          <Image
+            alt={name}
+            className=" bg-cover hover:cursor-pointer w-full flex-1"
+            height={200}
+            isZoomed
+            src={`${REQUEST_BASE_URL}/cover/${cover}`}
+            fallbackSrc={"/src/assets/defaultBgOfLesson.jpg"}
+            onClick={() => {
+              setSelectedKeys(selectedKeys.has("1") ? new Set() : new Set("1"));
+            }}
+          />
+          <Accordion
+            className=" absolute z-10 top-0"
+            selectedKeys={selectedKeys}
+            //@ts-ignore
+            onSelectionChange={setSelectedKeys}
           >
-            <div
-              className="flex flex-col gap-2 text-slate-500 bg-white text-sm p-2 rounded-md border-1 border-cyan-500 hover:cursor-pointer"
-              onClick={() => {
-                setSelectedKeys(
-                  selectedKeys.has("1") ? new Set() : new Set("1"),
-                );
-              }}
+            <AccordionItem
+              key="1"
+              aria-label="1"
+              startContent={<span className="text-xs text-white/80">详情</span>}
+              indicator={<></>}
+              className={`${styles.accordionItem} `}
             >
-              <p>{teacherName}</p>
-              <p>
-                开课时间：{dayjs(startTime).format("YYYY-MM-DD HH:mm")}至
-                {dayjs(endTime).format("YYYY-MM-DD HH:mm")}
-              </p>
-            </div>
-          </AccordionItem>
-        </Accordion>
-        {tabKey === ETab.MY_LESSON && (
-          <div className=" z-10 absolute top-0 right-2 hover:cursor-pointer">
-            <Dropdown>
-              <DropdownTrigger>
-                <EllipsisOutlined
-                  className="capitalize"
-                  style={{ fontSize: 20, color: "#bfbfbf" }}
-                />
-              </DropdownTrigger>
-              <DropdownMenu aria-label="Dropdown Variants" variant={"faded"}>
-                {/* <DropdownItem key="new">收藏</DropdownItem> */}
-                <DropdownItem
-                  key="delete"
-                  className="text-danger"
-                  color="danger"
-                >
-                  移除
-                </DropdownItem>
-              </DropdownMenu>
-            </Dropdown>
-          </div>
-        )}
-        <CardFooter className="justify-between before:bg-white/10 border-white/20 border-1 overflow-hidden py-1 absolute before:rounded-xl rounded-large bottom-1 w-[calc(100%_-_8px)] shadow-small ml-1 z-10">
-          <div
-            className="text-xs text-white/80 w-full flex-nowrap  items-center"
-            ref={titleBoxRef}
-          >
-            {tabKey === ETab.LESSON_CENTER && hasChosen ? (
-              <Chip
-                //@ts-ignore
-                color={"primary"}
-                className=" mr-2 text-white/80 text-[10px]"
-                size="sm"
-                variant="dot"
+              <div
+                className="flex flex-col gap-2 text-slate-500 bg-white text-sm p-2 rounded-md border-1 border-cyan-500 hover:cursor-pointer"
+                onClick={() => {
+                  setSelectedKeys(
+                    selectedKeys.has("1") ? new Set() : new Set("1"),
+                  );
+                }}
               >
-                已选择
-              </Chip>
-            ) : (
-              <Chip
-                //@ts-ignore
-                color={statusInfo.color}
-                className=" mr-2 text-white/80 text-[10px]"
-                size="sm"
-                variant="dot"
-              >
-                {statusInfo.text}
-              </Chip>
+                <p>{teacherName}</p>
+                <p>
+                  开课时间：{dayjs(startTime).format("YYYY-MM-DD HH:mm")}至
+                  {dayjs(endTime).format("YYYY-MM-DD HH:mm")}
+                </p>
+              </div>
+            </AccordionItem>
+          </Accordion>
+          {tabKey === ETab.MY_LESSON &&
+            userInfo.permissions.includes(PermissionEnum.MANAGE_LESSON) &&
+            ownerId === userInfo.userid && (
+              <div className=" z-10 absolute top-0 right-2 hover:cursor-pointer">
+                <Dropdown>
+                  <DropdownTrigger>
+                    <EllipsisOutlined
+                      className="capitalize"
+                      style={{ fontSize: 20, color: "#bfbfbf" }}
+                    />
+                  </DropdownTrigger>
+                  <DropdownMenu
+                    aria-label="Dropdown Variants"
+                    variant={"faded"}
+                  >
+                    {/* <DropdownItem key="new">收藏</DropdownItem> */}
+                    <DropdownItem
+                      key="delete"
+                      className="text-danger"
+                      color="danger"
+                      onPress={async () => {
+                        onOpen();
+                      }}
+                    >
+                      移除
+                    </DropdownItem>
+                  </DropdownMenu>
+                </Dropdown>
+              </div>
             )}
-
-            <Typography.Text
-              className={cn("text-xs text-white/80 -translate-y-1")}
-              style={{
-                width: titleWidth ? titleWidth - 68 : "auto",
-              }}
-              ellipsis={{
-                tooltip: name,
-              }}
+          <CardFooter className="justify-between before:bg-white/10 border-white/20 border-1 overflow-hidden py-1 absolute before:rounded-xl rounded-large bottom-1 w-[calc(100%_-_8px)] shadow-small ml-1 z-10">
+            <div
+              className="text-xs text-white/80 w-full flex-nowrap  items-center"
+              ref={titleBoxRef}
             >
-              {name}
-            </Typography.Text>
-          </div>
-          {status === LessonStatus.ON &&
-            tabKey === ETab.MY_LESSON &&
-            userInfo.permissions.includes(PermissionEnum.CHAT) && (
+              {tabKey === ETab.LESSON_CENTER && hasChosen ? (
+                <Chip
+                  //@ts-ignore
+                  color={"primary"}
+                  className=" mr-2 text-white/80 text-[10px]"
+                  size="sm"
+                  variant="dot"
+                >
+                  已选择
+                </Chip>
+              ) : (
+                <Chip
+                  //@ts-ignore
+                  color={statusInfo.color}
+                  className=" mr-2 text-white/80 text-[10px]"
+                  size="sm"
+                  variant="dot"
+                >
+                  {statusInfo.text}
+                </Chip>
+              )}
+
+              <Typography.Text
+                className={cn("text-xs text-white/80 -translate-y-1")}
+                style={{
+                  width: titleWidth ? titleWidth - 68 : "auto",
+                }}
+                ellipsis={{
+                  tooltip: name,
+                }}
+              >
+                {name}
+              </Typography.Text>
+            </div>
+            {status === LessonStatus.ON &&
+              tabKey === ETab.MY_LESSON &&
+              userInfo.permissions.includes(PermissionEnum.CHAT) && (
+                <Button
+                  className="text-tiny text-white bg-black/20"
+                  color="default"
+                  radius="lg"
+                  size="sm"
+                  variant="flat"
+                  onClick={() => {
+                    navigate(`/ai/chat/${lessonId}`);
+                  }}
+                >
+                  提问
+                </Button>
+              )}
+            {isShowManage ? (
               <Button
-                className="text-tiny text-white bg-black/20"
+                className="text-tiny text-white bg-black/20 ml-2"
                 color="default"
                 radius="lg"
                 size="sm"
                 variant="flat"
                 onClick={() => {
-                  navigate(`/ai/chat/${lessonId}`);
+                  navigate(`/ai/manage/${lessonId}`);
                 }}
               >
-                提问
+                管理
               </Button>
+            ) : null}
+            {tabKey === ETab.LESSON_CENTER &&
+              !hasChosen &&
+              status !== LessonStatus.OVER && (
+                <Button
+                  className="text-tiny text-white bg-black/20 ml-2"
+                  color="default"
+                  radius="lg"
+                  size="sm"
+                  variant="flat"
+                  isLoading={isJoinLoading}
+                  onPress={async () => {
+                    try {
+                      setIsJoinLoading(true);
+                      await joinLesson({ lessonId });
+                      message.success(`成功加入${name}`);
+                      const list = [...lessonList];
+                      list[index] = {
+                        ...list[index],
+                        hasChosen: true,
+                      };
+                      setList(list);
+                    } catch (error: any) {
+                      const msg = error?.error_msg || error?.message || error;
+                      message.error(msg);
+                    }
+                    setIsJoinLoading(false);
+                  }}
+                >
+                  加入课程
+                </Button>
+              )}
+          </CardFooter>
+        </Card>
+        <Modal
+          backdrop="blur"
+          isOpen={isOpen}
+          onOpenChange={onOpenChange}
+          isDismissable={false}
+        >
+          <ModalContent>
+            {(onClose) => (
+              <>
+                <ModalHeader>
+                  <ExclamationCircleOutlined className=" text-danger-500 mr-2" />
+                  删除课程
+                </ModalHeader>
+                <ModalBody>
+                  <>
+                    <span>
+                      确定要删除<strong className="mx-2">{name}</strong>
+                      吗？(该过程不可逆)
+                    </span>
+                    <Input
+                      label="确认删除"
+                      placeholder={name}
+                      validate={(value) => {
+                        if (value === name) {
+                          setIsDeleteDisabled(false);
+                          return true;
+                        } else {
+                          setIsDeleteDisabled(true);
+                          return "请确认课程名称";
+                        }
+                      }}
+                    ></Input>
+                  </>
+                </ModalBody>
+                <ModalFooter>
+                  <Button color="danger" variant="light" onPress={onClose}>
+                    取消
+                  </Button>
+                  <Button
+                    color="primary"
+                    isLoading={isDeleteLoading}
+                    isDisabled={isDeleteDisabled}
+                    onPress={async () => {
+                      try {
+                        setIsDeleteLoading(true);
+                        await deleteLesson({ lessonId });
+                        message.success("删除成功");
+                        refresh();
+                        onClose();
+                      } catch (error: any) {
+                        const msg = error?.error_msg || error?.message || error;
+                        message.error(msg);
+                      }
+                      setIsDeleteLoading(false);
+                    }}
+                  >
+                    确定
+                  </Button>
+                </ModalFooter>
+              </>
             )}
-          {isShowManage ? (
-            <Button
-              className="text-tiny text-white bg-black/20 ml-2"
-              color="default"
-              radius="lg"
-              size="sm"
-              variant="flat"
-              onClick={() => {
-                navigate(`/ai/manage/${lessonId}`);
-              }}
-            >
-              管理
-            </Button>
-          ) : null}
-          {tabKey === ETab.LESSON_CENTER && !hasChosen && (
-            <Button
-              className="text-tiny text-white bg-black/20 ml-2"
-              color="default"
-              radius="lg"
-              size="sm"
-              variant="flat"
-              onPress={() => {}}
-            >
-              加入课程
-            </Button>
-          )}
-        </CardFooter>
-      </Card>
+          </ModalContent>
+        </Modal>
+      </>
     );
   },
 );
@@ -281,7 +390,7 @@ const Lesson = () => {
     isCenter?: boolean,
   ) => {
     if (isLoading) {
-      return;
+      return false;
     }
     setSearchConfig(config);
     setIsLoading(true);
@@ -300,14 +409,30 @@ const Lesson = () => {
         total: res.data.total,
         hasMore: config.offset + DEFAULT_LIMIT < res.data.total,
       });
+      setIsLoading(false);
+      return true;
     } catch (error: any) {
       const msg = error?.error_msg || error?.message || error;
       message.error(msg);
     }
-
     setIsLoading(false);
+    //给无限滚动组件里面做是否错误的判断
+    return false;
   };
+  const refresh = async () => {
+    setLessonList([]);
 
+    await getLessons(
+      {
+        limit: DEFAULT_LIMIT,
+        offset: 0,
+        total: 0,
+        hasMore: true,
+        lessonName: "",
+      },
+      tabKey === ETab.LESSON_CENTER,
+    );
+  };
   useEffect(() => {}, [tabKey]);
 
   return (
@@ -399,8 +524,7 @@ const Lesson = () => {
                   <InfiniteScroll
                     dataLength={lessonList.length}
                     next={async () => {
-                      await getLessons(searchConfig);
-                      console.log("inifinitescroll触发");
+                      return await getLessons(searchConfig);
                     }}
                     hasMore={searchConfig.hasMore}
                     loader={<LoaderAnimation></LoaderAnimation>}
@@ -416,11 +540,15 @@ const Lesson = () => {
                     hasChildren={true}
                   >
                     <div className="flex flex-wrap justify-start gap-8">
-                      {lessonList.map((i) => {
+                      {lessonList.map((i, index) => {
                         return (
                           <LessonCard
                             key={i.id}
                             {...i}
+                            index={index}
+                            setList={setLessonList}
+                            lessonList={lessonList}
+                            refresh={refresh}
                             userInfo={userInfo}
                             isShowManage={
                               userInfo.userid === i.ownerId &&
@@ -511,11 +639,15 @@ const Lesson = () => {
                     hasChildren={true}
                   >
                     <div className="flex flex-wrap justify-start gap-8">
-                      {lessonList.map((i) => {
+                      {lessonList.map((i, index) => {
                         return (
                           <LessonCard
                             key={i.id}
                             {...i}
+                            index={index}
+                            setList={setLessonList}
+                            lessonList={lessonList}
+                            refresh={refresh}
                             userInfo={userInfo}
                             tabKey={tabKey}
                           ></LessonCard>
@@ -633,23 +765,28 @@ const Lesson = () => {
                   <Button
                     color="primary"
                     onPress={async () => {
-                      await formRef.current?.validateFields();
-                      const values = formRef.current?.getFieldsValue();
-                      await addLesson({
-                        name: values.name,
-                        startTime: dayjs(values.time[0]).valueOf(),
-                        endTime: dayjs(values.time[1]).valueOf(),
-                        college: values.college,
-                      });
-                      setLessonList([]);
-                      await getLessons({
-                        ...searchConfig,
-                        lessonName: "",
-                        offset: 0,
-                        total: 0,
-                        hasMore: true,
-                      });
-                      console.log("values", formRef.current?.getFieldsValue());
+                      try {
+                        await formRef.current?.validateFields();
+                        const values = formRef.current?.getFieldsValue();
+                        await addLesson({
+                          name: values.name,
+                          startTime: dayjs(values.time[0]).valueOf(),
+                          endTime: dayjs(values.time[1]).valueOf(),
+                          college: values.college,
+                        });
+                        setLessonList([]);
+                        await getLessons({
+                          ...searchConfig,
+                          lessonName: "",
+                          offset: 0,
+                          total: 0,
+                          hasMore: true,
+                        });
+                        onClose();
+                      } catch (error: any) {
+                        const msg = error?.error_msg || error?.message || error;
+                        message.error(msg);
+                      }
                     }}
                   >
                     确定

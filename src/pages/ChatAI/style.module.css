@@ -3,6 +3,7 @@
     display: none;
   }
 }
+
 /* 代码块容器定位 */
 .code-block-wrapper {
   position: relative;
@@ -13,6 +14,7 @@
 .code-block-wrapper:hover .copy-button {
   opacity: 1;
 }
+
 .copy-button {
   filter: brightness(1.1);
   font-size: 12px;
@@ -34,6 +36,7 @@
   perspective: 600px;
   transition: transform 0.1s;
 }
+
 .sp {
   background: linear-gradient(
     90deg,
@@ -47,6 +50,7 @@
   -webkit-text-fill-color: transparent;
   background-clip: text;
   display: block;
+
   &:hover {
     filter: brightness(1.3);
   }
@@ -56,6 +60,7 @@
   transition: 0.3s;
   transform: scale(0.93);
 }
+
 .error-block {
   background-color: #f8d7da;
   color: #721c24;
@@ -65,4 +70,31 @@
   font-size: 14px;
   line-height: 1.5;
   text-align: center;
+}
+
+.carouselArrows {
+  :global(button.slick-arrow.slick-prev):hover {
+    width: 30px;
+    height: 30px;
+    border-radius: 12px;
+    background-color: black;
+    opacity: 0.6;
+    transform: translateX(-8px) translateY(-16px);
+    &::after {
+      top: 10px;
+      left: 10px;
+    }
+  }
+  :global(button.slick-arrow.slick-next):hover {
+    width: 30px;
+    height: 30px;
+    border-radius: 12px;
+    background-color: black;
+    opacity: 0.6;
+    transform: translateX(8px) translateY(-16px);
+    &::after {
+      top: 10px;
+      left: 8px;
+    }
+  }
 }

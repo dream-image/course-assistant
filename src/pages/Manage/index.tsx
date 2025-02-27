@@ -2,10 +2,11 @@ import {
   changeLessonCover,
   getLessonFileList,
   getLessonInfo,
+  getLessonStudentsList,
   removeLessonFile,
   updateLesson,
 } from "@/api";
-import { LessonFile, LessonType } from "@/api/type";
+import { LessonFile, LessonType, LessonUserType } from "@/api/type";
 import { FileType, getBase64, getToken, stop } from "@/utils";
 import { UploadOutlined } from "@ant-design/icons";
 import { ProDescriptions, ProFormItemRender } from "@ant-design/pro-components";
@@ -26,6 +27,7 @@ import {
   ModalContent,
   ModalFooter,
   ModalHeader,
+  Pagination,
   Tab,
   Tabs,
   Tooltip,
@@ -40,7 +42,7 @@ import {
   Modal as AntdModal,
 } from "antd";
 import { isUndefined } from "lodash-es";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import styles from "./style.module.less";
 import { REQUEST_BASE_URL } from "@/common/request";
@@ -48,8 +50,11 @@ import dayjs, { Dayjs } from "dayjs";
 import LessonFileCard from "@/components/LessonFileCard";
 import { UploadFile } from "antd/lib";
 import LoaderAnimation from "@/components/LoaderAnimation";
+import StudentShow from "@/components/StudentShow";
+import { UserInfoContext } from "@/context/UserInfoContext";
 const acceptFileExtension = ["pdf", "ppt", "pptx", "doc", "docx"];
-const beforeUpload = (file: FileType) => {
+const DEFAULT_LIMIT = 10;
+export const beforeUpload = (file: FileType) => {
   const isJpgOrPng = file.type === "image/jpeg" || file.type === "image/png";
   if (!isJpgOrPng) {
     message.error("只支持png和jpeg格式的图片");
@@ -62,11 +67,18 @@ const beforeUpload = (file: FileType) => {
 };
 const Manage = () => {
   const [tabKey, setTabKey] = useState<string>("center");
+  const { userInfo } = useContext(UserInfoContext);
   const navigate = useNavigate();
   const params = useParams();
   const [lesson, setLesson] = useState<LessonType>();
   const [isLoading, setIsLoading] = useState(false);
   const [lessonFiles, setLessonFiles] = useState<LessonFile[]>([]);
+  const [lessonUsers, setLessonUsers] = useState<LessonUserType[]>([]);
+  const [pageInfo, setPageInfo] = useState({
+    total: 0,
+    limit: 1,
+    offset: 0,
+  });
   const [uploadFileListInModal, setUploadFileListInModal] = useState<
     UploadFile[]
   >([]);
@@ -82,20 +94,35 @@ const Manage = () => {
   const getLesson = async () => {
     try {
       if (isUndefined(params.id) || isNaN(Number(params.id))) {
-        navigate(-1);
-        return;
+        setTimeout(() => {
+          navigate(-1);
+        }, 500);
+        return Promise.reject();
       }
       const res = await getLessonInfo(Number(params.id));
+      if (res.data.list[0].ownerId !== userInfo.userid) {
+        message.error("你没有权限管理该课程");
+        setTimeout(() => {
+          navigate(-1);
+        }, 500);
+        return Promise.reject("你没有权限管理该课程");
+      }
       if (res.data.total) {
         setLesson(res.data.list[0]);
         return res.data.list[0];
       } else {
         message.error("该课程不存在");
-        navigate(-1);
+        setTimeout(() => {
+          navigate(-1);
+        }, 500);
+        return Promise.reject("该课程不存在");
       }
     } catch (error: any) {
       message.error(error?.error_msg || error?.message || "获取课程信息失败");
-      navigate(-1);
+      setTimeout(() => {
+        navigate(-1);
+      }, 500);
+      return Promise.reject();
     }
   };
   const getLessonFiles = async () => {
@@ -107,6 +134,7 @@ const Manage = () => {
         return;
       }
       const res = await getLessonFileList({ lessonId: Number(params.id) });
+
       setLessonFiles(res.data);
     } catch (error: any) {
       message.error(
@@ -115,9 +143,45 @@ const Manage = () => {
     }
     setIsLoading(false);
   };
+  const getLessonStudents = async (pageInfo?: {
+    limit: number;
+    offset: number;
+  }) => {
+    try {
+      const { limit = DEFAULT_LIMIT, offset = 0 } = pageInfo || {};
+      if (isUndefined(params.id) || isNaN(Number(params.id))) {
+        navigate(-1);
+        setIsLoading(false);
+        return;
+      }
+      const res = await getLessonStudentsList({
+        lessonId: Number(params.id),
+        limit: limit,
+        offset: offset,
+      });
+      setLessonUsers(res.data.list);
+      setPageInfo({
+        total: res.data.total,
+        limit: limit,
+        offset: offset + limit,
+      });
+      console.log(res);
+    } catch (error: any) {
+      message.error(
+        error?.error_msg || error?.message || "获取课程用户列表失败",
+      );
+    }
+  };
+  const refreshLessonStudents = async () => {
+    await getLessonStudents({
+      limit: pageInfo.limit,
+      offset: 0,
+    });
+  };
   const init = async () => {
-    getLesson();
+    await getLesson();
     getLessonFiles();
+    getLessonStudents(pageInfo);
   };
   useEffect(() => {
     init();
@@ -165,7 +229,7 @@ const Manage = () => {
                   </div>
                 </div>
               </CardHeader>
-              <CardBody className="flex flex-col gap-3">
+              <CardBody className="flex flex-col gap-3 no-scrollbar">
                 <Accordion
                   variant="splitted"
                   defaultExpandedKeys={["1"]}
@@ -372,11 +436,29 @@ const Manage = () => {
                       })
                     )}
                   </AccordionItem>
-                  <AccordionItem
-                    key="3"
-                    aria-label="学生列表"
-                    title="学生列表"
-                  ></AccordionItem>
+                  <AccordionItem key="3" aria-label="用户列表" title="用户列表">
+                    <StudentShow
+                      lessonInfo={lesson}
+                      userId={userInfo.userid}
+                      users={lessonUsers}
+                      refreshLessonStudents={refreshLessonStudents}
+                    ></StudentShow>
+                    {pageInfo.total / pageInfo.limit > 1 ? (
+                      <Pagination
+                        showControls
+                        showShadow
+                        className=" mt-2 ml-auto"
+                        page={pageInfo.offset / pageInfo.limit}
+                        total={pageInfo.total / pageInfo.limit}
+                        onChange={(page) => {
+                          getLessonStudents({
+                            offset: (page - 1) * pageInfo.limit,
+                            limit: pageInfo.limit,
+                          });
+                        }}
+                      />
+                    ) : null}
+                  </AccordionItem>
                 </Accordion>
               </CardBody>
             </>

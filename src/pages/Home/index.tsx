@@ -21,6 +21,7 @@ import student from "@/assets/student.svg";
 import hduLogo from "@/assets/hdulogo.png";
 import legal from "@/assets/官方认证.svg";
 import { setToken } from "@/utils";
+import { REQUEST_BASE_URL } from "@/common/request";
 const RoleTag = (props: {
   userInfo?: UserInfo;
   text?: string;
@@ -56,8 +57,10 @@ const RoleTag = (props: {
     );
   return (
     <>
-      <Chip variant="bordered" className="flex">
-        <Image src={student}></Image>
+      <Chip
+        variant="faded"
+        startContent={<Image src={student} width={20} height={20}></Image>}
+      >
         <span>老师</span>
       </Chip>
     </>
@@ -72,9 +75,9 @@ const AvatarInfo = (props: {
   const { userInfo, hasIcon = true, widthFlex = true } = props;
   return (
     <>
-      <Avatar src={image} size="md" />
+      <Avatar src={`${REQUEST_BASE_URL}/cover/${userInfo?.avatar}`} size="md" />
       <div className={` h-full flex items-center ${widthFlex ? "flex-1" : ""}`}>
-        <div className="flex flex-col justify-center items-center">
+        <div className="flex flex-col justify-center items-start">
           <span className="text-[#1f1f1f] text-sm w-max">
             {userInfo.nickname}
           </span>

@@ -1,12 +1,12 @@
-import { getAiVersions, getLessonInfo } from "@/api";
+import { getAiVersions, getLessonFileList, getLessonInfo } from "@/api";
 import { useXAgent, useXChat, Sender, Bubble } from "@ant-design/x";
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { message, Space, Typography } from "antd";
+import { Carousel, message, Space, Typography } from "antd";
 import styles from "./style.module.css";
-import { Button, Card, CardBody, Alert } from "@heroui/react";
+import { Button, Card, CardBody, Alert, CardHeader, cn } from "@heroui/react";
 import { useNavigate, useParams } from "react-router-dom";
 import { isNaN, isUndefined } from "lodash-es";
-import { LessonType, Modal } from "@/api/type";
+import { LessonFile, LessonType, Modal } from "@/api/type";
 import { BubbleListProps } from "@ant-design/x/es/bubble/BubbleList";
 import {
   CopyOutlined,
@@ -19,6 +19,7 @@ import CustomeButtonRadioGroup from "@/components/Radio";
 import NewChat from "@/components/newChat";
 import MarkdownRenderer from "@/components/CodeBlock";
 import { REQUEST_BASE_URL } from "@/common/request";
+import LessonFileCard from "@/components/LessonFileCard";
 const enum AbnormalState {
   LOADING = "loading",
   ERROR = "error",
@@ -61,18 +62,19 @@ const ChatAI: React.FC = () => {
   const [lesson, setLesson] = useState<LessonType>();
   const [value, setValue] = useState<string>();
   const controllerRef = useRef<AbortController>();
-  const [modalList, setModalList] = useState<Modal[]>([]);
-  const [modal, setModal] = useState<Modal>();
-  const modalRef = useRef<string>();
+  const [modelList, setModalList] = useState<Modal[]>([]);
+  const [model, setModal] = useState<Modal>();
+  const modelRef = useRef<string>();
   const messageRef = useRef<string>("");
-  const [modalBarVisible, setModalBarVisible] = useState(true);
+  const [modelBarVisible, setModalBarVisible] = useState(true);
+  const [lessonFiles, setLessonFiles] = useState<LessonFile[]>([]);
   const defaultModalName = useMemo(() => {
     const currentDefalut = localStorage.getItem("defaultModalName");
-    if (modalList.find((i) => i.name === currentDefalut)) {
+    if (modelList.find((i) => i.name === currentDefalut)) {
       return currentDefalut;
     }
-    return modalList[0]?.name;
-  }, [modalList]);
+    return modelList[0]?.name;
+  }, [modelList]);
   const [agent] = useXAgent({
     request: async (info, callbacks) => {
       const { messages, message: _message } = info;
@@ -102,7 +104,7 @@ const ChatAI: React.FC = () => {
           body: JSON.stringify({
             questions: messages,
             lessonId: Number(params.id),
-            modalName: modalRef.current,
+            modelName: modelRef.current,
           }),
         });
         if (response.status > 300) {
@@ -319,9 +321,11 @@ const ChatAI: React.FC = () => {
         navigate(-1);
       }
       const {
-        data: { modal },
+        data: { model },
       } = await getAiVersions();
-      setModalList(modal);
+      setModalList(model);
+      const res2 = await getLessonFileList({ lessonId: Number(params.id) });
+      setLessonFiles(res2.data);
     } catch (error: any) {
       message.error(error?.error_msg || error?.message || "获取课程信息失败");
       navigate(-1);
@@ -333,8 +337,8 @@ const ChatAI: React.FC = () => {
   };
 
   useEffect(() => {
-    modalRef.current = modal?.name;
-  }, [modal]);
+    modelRef.current = model?.name;
+  }, [model]);
   useEffect(() => {
     init();
     // document.addEventListener("click", copy);
@@ -348,7 +352,7 @@ const ChatAI: React.FC = () => {
     >
       <div className="left-0 right-0 mx-auto w-full ">
         <Card className=" shadow-none transition-shadow  group-hover:shadow-md">
-          <CardBody className="  flex flex-row items-end align-bottom justify-center mix-blend-normal">
+          <CardBody className="  flex flex-row items-end align-bottom justify-center mix-blend-normal relative">
             <span className="w-max h-min">{lesson?.name}</span>
             <span className="w-max text-xs h-min text-gray-600 ml-2 -translate-y-[2px]">
               {lesson?.teacherName}
@@ -356,6 +360,42 @@ const ChatAI: React.FC = () => {
           </CardBody>
         </Card>
       </div>
+      {lessonFiles.length ? (
+        <Card className="absolute top-0 w-min h-min -right-48 ">
+          <CardHeader className=" opacity-70 font-medium">课程资料</CardHeader>
+          <CardBody className="flex flex-col gap-3">
+            {new Array(Math.ceil(lessonFiles.length / 5))
+              .fill(1)
+              .map((i, index) => {
+                const list = lessonFiles.slice(index * 5, (index + 1) * 5); // 切片
+                return (
+                  <Carousel
+                    key={index}
+                    className={cn(
+                      "w-40 h-28 rounded-2xl overflow-hidden",
+                      styles.carouselArrows,
+                    )}
+                    autoplay={{ dotDuration: true }}
+                    autoplaySpeed={5000}
+                    arrows
+                  >
+                    {list.map((i, index) => {
+                      return (
+                        <LessonFileCard
+                          {...i}
+                          key={index}
+                          isPreview={true}
+                          lesson={lesson}
+                          fileName={i.name}
+                        ></LessonFileCard>
+                      );
+                    })}
+                  </Carousel>
+                );
+              })}
+          </CardBody>
+        </Card>
+      ) : null}
       <div
         className={`flex-1 overflow-auto py-4 ${styles.scroll}`}
         ref={bubbleWrapperRef}
@@ -385,7 +425,7 @@ const ChatAI: React.FC = () => {
             <Sender.Header
               closable={false}
               style={
-                !modalBarVisible
+                !modelBarVisible
                   ? {
                       width: 20,
                       height: 20,
@@ -408,18 +448,18 @@ const ChatAI: React.FC = () => {
                 },
               }}
             >
-              {modalBarVisible ? (
+              {modelBarVisible ? (
                 <>
                   <div className=" max-w-[650px] overflow-auto">
                     <CustomeButtonRadioGroup
                       defaultValue={defaultModalName}
-                      value={modal?.name}
+                      value={model?.name}
                       className="flex gap-3 flex-none max-w-max"
                       onSelect={(v) => {
                         localStorage.setItem("defaultModalName", v || "");
-                        setModal(modalList.find((i) => i.name === v));
+                        setModal(modelList.find((i) => i.name === v));
                       }}
-                      list={modalList.map((i) => {
+                      list={modelList.map((i) => {
                         return {
                           label: i.name,
                           value: i.name,
@@ -433,19 +473,19 @@ const ChatAI: React.FC = () => {
                 <Button
                   isIconOnly
                   size="sm"
-                  variant={modalBarVisible ? "light" : "bordered"}
+                  variant={modelBarVisible ? "light" : "bordered"}
                   style={
-                    modalBarVisible
+                    modelBarVisible
                       ? {
                           marginLeft: 4,
                         }
                       : {}
                   }
                   onClick={() => {
-                    setModalBarVisible(!modalBarVisible);
+                    setModalBarVisible(!modelBarVisible);
                   }}
                 >
-                  {modalBarVisible ? (
+                  {modelBarVisible ? (
                     <DownOutlined
                       width={20}
                       height={20}

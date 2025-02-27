@@ -46,7 +46,7 @@ export function parseThreshold(scrollThreshold: string | number) {
 }
 type Fn = () => any;
 export interface Props {
-  next: Fn;
+  next: () => Promise<boolean>;
   hasMore: boolean;
   children: ReactNode;
   loader: ReactNode;
@@ -91,7 +91,7 @@ export default class InfiniteScroll extends Component<Props, State> {
     this.onMove = this.onMove.bind(this);
     this.onEnd = this.onEnd.bind(this);
   }
-
+  #retryCount = 5;
   private throttledOnScrollListener: (e: MouseEvent) => void;
   private el: HTMLElement | undefined | (Window & typeof globalThis);
   private _infScroll: HTMLDivElement | undefined;
@@ -123,6 +123,15 @@ export default class InfiniteScroll extends Component<Props, State> {
         "scroll",
         this.throttledOnScrollListener as EventListenerOrEventListenerObject,
       );
+      if (
+        //@ts-ignore
+        this.el.scrollHeight <= this.el.clientHeight &&
+        this.props.hasMore
+      ) {
+        this.actionTriggered = true;
+        this.setState({ showLoader: true });
+        this.props.next && this.props.next();
+      }
       this.IntervalSearch = setInterval(
         (() => {
           if (
@@ -132,7 +141,19 @@ export default class InfiniteScroll extends Component<Props, State> {
           ) {
             this.actionTriggered = true;
             this.setState({ showLoader: true });
-            this.props.next && this.props.next();
+            this.props.next &&
+              this.props
+                .next()
+                .then((i: boolean) => {
+                  if (!i) {
+                    if (this.#retryCount <= 0)
+                      clearInterval(this.IntervalSearch);
+                    this.#retryCount--;
+                  }
+                })
+                .catch((e) => {
+                  clearInterval(this.IntervalSearch);
+                });
           }
         }).bind(this),
         1000,

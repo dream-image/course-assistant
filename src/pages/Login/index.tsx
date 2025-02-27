@@ -25,7 +25,10 @@ const Login = () => {
       }
       const res = await login(loginInfo);
 
-      setUserInfo({ ...res.data?.data, hasLogin: true });
+      setUserInfo({
+        ...res.data?.data,
+        hasLogin: true,
+      });
       setUserInfoContext({ ...res.data?.data, hasLogin: true });
       setToken(res.headers["authorization"]);
       autoRefreshToken();
@@ -48,7 +51,7 @@ const Login = () => {
           <span className="font-semibold font-kai text-2xl">天书</span>
         </div>
         <div className=" h-[400px] flex-col mt-32 w-96 animate__animated  animate__bounceIn ">
-          <div className="flex content-center w-full h-min mb-5">
+          <div className="flex content-center w-full h-min mb-5 animate-pulse">
             <Image src={welcome} alt="欢迎" width={40} height={40}></Image>
             <span className="text-3xl align-bottom h-min my-auto font-bold">
               Welcome!

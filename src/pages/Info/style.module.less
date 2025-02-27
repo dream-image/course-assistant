@@ -1,0 +1,15 @@
+@import "/src/index.less";
+.progress {
+  div[class*="ant-progress-steps-item"] {
+    border-radius: 8px;
+  }
+}
+
+.upload {
+  height: 176px;
+  width: 176px;
+  :global(div.@{ant-preifx}-upload.@{ant-preifx}-upload-select) {
+    height: 100% !important;
+    width: 100% !important;
+  }
+}

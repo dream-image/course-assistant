@@ -27,11 +27,12 @@ type Props = {
   coverUrl?: string;
   fileName: string;
   lesson?: LessonType;
-  refresh: () => void;
+  isPreview?: boolean;
+  refresh?: () => void;
 };
 
 const LessonFileCard = (props: Props) => {
-  const { coverUrl, fileName, lesson, refresh } = props;
+  const { coverUrl, fileName, lesson, refresh, isPreview } = props;
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const wrapperRef = useRef<HTMLDivElement>(null);
   const [forceUpdate, setForceUpdate] = useState(0);
@@ -54,13 +55,13 @@ const LessonFileCard = (props: Props) => {
   return (
     <>
       <div
-        className=" group w-40 h-28 shadow-2xl rounded-lg transition-all duration-300 ease-in-out flex-grow max-w-[200px] relative animate-opacity"
+        className=" group/item w-40 h-28 shadow-2xl rounded-lg transition-all duration-300 ease-in-out flex-grow max-w-[200px] relative animate-opacity"
         ref={wrapperRef}
       >
-        <div className="absolute w-full h-full opacity-70 hidden group-hover:block bg-black  rounded-xl z-[40]">
+        <div className="absolute w-full h-full opacity-70 hidden group-hover/item:block bg-black  rounded-xl z-[40]">
           {wrapperRef.current
             ? createPortal(
-                <div className=" z-50 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 group-hover:flex hidden gap-1">
+                <div className=" z-50 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 group-hover/item:flex hidden gap-1">
                   <Button
                     title="文件预览"
                     isIconOnly
@@ -102,43 +103,45 @@ const LessonFileCard = (props: Props) => {
                       ></path>
                     </svg>
                   </Button> */}
-                  <Button
-                    title="删除文件"
-                    isIconOnly
-                    variant="light"
-                    color="danger"
-                    className=" "
-                    onPress={async () => {
-                      const res = await new Promise((resolve, reject) => {
-                        AntdModal.confirm({
-                          title: "确认删除",
-                          content: "确认删除该文件吗？",
-                          onOk: () => {
-                            resolve(true);
-                          },
-                          onCancel: () => {
-                            resolve(false);
-                          },
-                        });
-                      });
-                      try {
-                        if (res) {
-                          await deleteLessonFile({
-                            lessonId: lesson!.lessonId,
-                            fileName,
+                  {!isPreview ? (
+                    <Button
+                      title="删除文件"
+                      isIconOnly
+                      variant="light"
+                      color="danger"
+                      className=" "
+                      onPress={async () => {
+                        const res = await new Promise((resolve, reject) => {
+                          AntdModal.confirm({
+                            title: "确认删除",
+                            content: "确认删除该文件吗？",
+                            onOk: () => {
+                              resolve(true);
+                            },
+                            onCancel: () => {
+                              resolve(false);
+                            },
                           });
-                          message.success("删除成功");
-                          refresh();
+                        });
+                        try {
+                          if (res) {
+                            await deleteLessonFile({
+                              lessonId: lesson!.lessonId,
+                              fileName,
+                            });
+                            message.success("删除成功");
+                            refresh && refresh();
+                          }
+                        } catch (error: any) {
+                          message.error(
+                            error?.error_msg || error?.message || error,
+                          );
                         }
-                      } catch (error: any) {
-                        message.error(
-                          error?.error_msg || error?.message || error,
-                        );
-                      }
-                    }}
-                  >
-                    <DeleteOutlined />
-                  </Button>
+                      }}
+                    >
+                      <DeleteOutlined />
+                    </Button>
+                  ) : null}
                 </div>,
                 wrapperRef.current,
               )

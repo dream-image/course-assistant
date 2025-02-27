@@ -61,7 +61,7 @@ export interface GetLessonListResponse {
 
 export interface GetAiVersionsResponse {
   data: {
-    modal: Modal[];
+    model: Modal[];
   };
 }
 
@@ -92,4 +92,23 @@ export interface LessonFile {
 }
 export interface GetLessonFileListResponse {
   data: LessonFile[];
+}
+export type LessonUserType = {
+  createTime: "2024-12-30T17:43:01.000Z";
+  userId: 1000001;
+  nickname: "挂逼再次";
+  avatar: "wxfile://tmp_1a8d2ae1c613965f7bb0a79f67d0492b6123da0646caaa1a.jpg";
+  sex: 1;
+  school: string;
+  role: "student" | "teacher";
+  email: string | null;
+  joinTime: number;
+  actions?: any;
+  useCount: number;
+};
+export interface GetLessonStudentsListResponse {
+  data: {
+    total: number;
+    list: LessonUserType[];
+  };
 }

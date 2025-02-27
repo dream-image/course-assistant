@@ -1,13 +1,23 @@
 import {
+  Avatar,
   Button,
   Card,
   CardBody,
   CardHeader,
+  Chip,
+  CircularProgress,
+  cn,
   commonColors,
   Divider,
   Image,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
   Tab,
   Tabs,
+  useDisclosure,
 } from "@heroui/react";
 import { useContext, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -16,23 +26,33 @@ import {
   FormControlRender,
   ProDescriptions,
   ProDescriptionsActionType,
+  ProFormItemRender,
 } from "@ant-design/pro-components";
 import { UserInfoContext } from "@/context/UserInfoContext";
-import { post } from "@/common/request";
-import { ConfigProvider, Form, Input, message, Progress } from "antd";
-import { isEmpty, isMatch, isUndefined } from "lodash-es";
+import { post, REQUEST_BASE_URL } from "@/common/request";
 import {
-  CameraOutlined,
-  CheckCircleOutlined,
-  CloseCircleOutlined,
-} from "@ant-design/icons";
-import styles from "./style.module.css";
+  Form,
+  Input,
+  message,
+  Progress,
+  Image as AntdImage,
+  Upload,
+} from "antd";
+import { isMatch, isUndefined } from "lodash-es";
+import { CameraOutlined, UploadOutlined } from "@ant-design/icons";
+import styles from "./style.module.less";
+import { beforeUpload } from "../Manage";
+import { FileType, getBase64, getToken } from "@/utils";
+import { changeUserAvatar, getUserInfo } from "@/api";
+import { PermissionEnum } from "@/common/permission";
 const Info = () => {
   const navigate = useNavigate();
   const { userInfo, setUserInfoContext } = useContext(UserInfoContext);
   const [tabKey, setTabKey] = useState<string>("info");
   const actionRef = useRef<ProDescriptionsActionType>();
+  const [isCoverLoading, setIsCoverLoading] = useState<boolean>(false);
   const [percent, setPercent] = useState<number>(0);
+  const { isOpen, onOpenChange, onOpen } = useDisclosure();
   const [form] = Form.useForm();
   return (
     <div className=" w-[1680px] h-full flex ml-4 relative">
@@ -57,14 +77,19 @@ const Info = () => {
             <>
               <CardHeader className="flex gap-3 ">
                 <div className="relative">
-                  <Image
+                  <Avatar
                     alt="头像"
-                    height={100}
                     radius="full"
-                    src={image}
-                    width={100}
+                    size="lg"
+                    className=" w-24 h-24"
+                    src={`${REQUEST_BASE_URL}/cover/${userInfo?.avatar}`}
                   />
-                  <CameraOutlined className="absolute bottom-1 right-2 text-sm z-10 text-stone-600 cursor-pointer" />
+                  <CameraOutlined
+                    className="absolute bottom-1 right-2 text-sm z-10 text-stone-600 cursor-pointer"
+                    onClick={() => {
+                      onOpen();
+                    }}
+                  />
                 </div>
               </CardHeader>
               <Divider />
@@ -90,10 +115,10 @@ const Info = () => {
                       }
                       try {
                         if (
-                          newInfo.info.nickname.length < 3 ||
-                          newInfo.info.nickname.length > 20
+                          newInfo.info.nickname.length < 2 ||
+                          newInfo.info.nickname.length > 8
                         ) {
-                          message.error("昵称长度不得小于1大于20");
+                          message.error("昵称长度不得小于2大于8");
                           return false;
                         }
                         await post("/updateUserInfo", {
@@ -117,11 +142,11 @@ const Info = () => {
                       rules: [
                         {
                           validator: (_, value) => {
-                            if (value.length < 3) {
-                              return Promise.reject("昵称长度不得小于3");
+                            if (value.length < 2) {
+                              return Promise.reject("昵称长度不得小于2");
                             }
-                            if (value.length > 20) {
-                              return Promise.reject("昵称长度不得大于20");
+                            if (value.length > 8) {
+                              return Promise.reject("昵称长度不得大于8");
                             }
                             return Promise.resolve();
                           },
@@ -155,7 +180,8 @@ const Info = () => {
                     }}
                     valueEnum={{
                       "1": "男",
-                      "0": "女",
+                      "2": "女",
+                      "0": "其他",
                     }}
                   />
                   <ProDescriptions.Item
@@ -318,6 +344,142 @@ const Info = () => {
           )}
         </Card>
       </div>
+      <>
+        <Modal isOpen={isOpen} onOpenChange={onOpenChange} size="3xl">
+          <ModalContent>
+            {(onClose) => {
+              return (
+                <>
+                  <ModalHeader className="flex flex-col gap-1">
+                    更改头像
+                  </ModalHeader>
+                  <ModalBody>
+                    <Form
+                      className=""
+                      labelAlign="right"
+                      labelCol={{ span: 3 }}
+                      wrapperCol={{ span: 12 }}
+                    >
+                      <Form.Item label="当前头像">
+                        <Avatar
+                          alt={"封面"}
+                          className="w-44 h-44"
+                          src={
+                            userInfo?.avatar
+                              ? `${REQUEST_BASE_URL}/cover/${userInfo?.avatar}`
+                              : ""
+                          }
+                        />
+                      </Form.Item>
+                      <ProFormItemRender
+                        name="newCover"
+                        label="新封面"
+                        className="h-[200px]"
+                      >
+                        {({ value, onChange }) => {
+                          return (
+                            <Upload
+                              name="avatar"
+                              rootClassName={cn(styles.upload, "")}
+                              action={REQUEST_BASE_URL + "/upload/cover/avatar"}
+                              showUploadList={false}
+                              listType="picture-circle"
+                              beforeUpload={beforeUpload}
+                              maxCount={1}
+                              headers={{
+                                Authorization: getToken() || "",
+                              }}
+                              onChange={(info) => {
+                                if (
+                                  info.file.status === "error" ||
+                                  (info.file.response?.result &&
+                                    info.file.response?.result !== 1)
+                                ) {
+                                  message.error("上传失败,请稍后重试");
+                                  setIsCoverLoading(false);
+                                  onChange("");
+                                  return;
+                                }
+                                if (info.file.status === "uploading") {
+                                  setIsCoverLoading(true);
+                                  onChange("");
+                                  return;
+                                }
+                                if (info.file.status === "done") {
+                                  getBase64(
+                                    info.file.originFileObj as FileType,
+                                    (url) => {
+                                      setIsCoverLoading(false);
+                                      onChange(url);
+                                    },
+                                  );
+                                }
+                              }}
+                            >
+                              {value ? (
+                                <Avatar
+                                  alt={"封面"}
+                                  className="w-44 h-44"
+                                  src={value}
+                                />
+                              ) : isCoverLoading ? (
+                                <>
+                                  <CircularProgress label="上传中" />
+                                </>
+                              ) : (
+                                <>
+                                  <Chip variant="light">
+                                    <div className="flex flex-col items-center justify-center">
+                                      <UploadOutlined />
+                                      <span>上传</span>
+                                      <span className="text-xs text-gray-500">
+                                        （图片只支持png和jpeg格式）
+                                      </span>
+                                    </div>
+                                  </Chip>
+                                </>
+                              )}
+                            </Upload>
+                          );
+                        }}
+                      </ProFormItemRender>
+                    </Form>
+                  </ModalBody>
+                  <ModalFooter>
+                    <Button color="danger" variant="light" onPress={onClose}>
+                      取消
+                    </Button>
+                    <Button
+                      color="primary"
+                      onPress={async () => {
+                        try {
+                          await changeUserAvatar();
+                          message.success("修改成功");
+                          onClose();
+                          const res = await getUserInfo();
+                          setUserInfoContext({
+                            ...res.data,
+                            hasLogin: true,
+                          });
+                        } catch (error: any) {
+                          const msg =
+                            error?.error_msg ||
+                            error?.message ||
+                            "网络错误，请稍后再试";
+                          console.error(error);
+                          message.error(msg);
+                        }
+                      }}
+                    >
+                      确定
+                    </Button>
+                  </ModalFooter>
+                </>
+              );
+            }}
+          </ModalContent>
+        </Modal>
+      </>
     </div>
   );
 };

@@ -7,4 +7,12 @@ export type UserInfo = {
   userid: number;
   sex: number;
   permissions: string[];
+  avatar: string;
+  email: string;
 };
+
+export enum ESex {
+  MALE = 1,
+  FEMALE = 0,
+  OTHER = 3,
+}

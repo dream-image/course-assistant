@@ -18,12 +18,6 @@ function App() {
       const res = await getUserInfo();
       setUserInfo({
         ...res.data,
-        permissions: [
-          PermissionEnum.CHAT,
-          PermissionEnum.MANAGE_LESSON,
-          PermissionEnum.UPLOAD_FILE,
-          PermissionEnum.CREATE_LESSON,
-        ],
         hasLogin: true,
       });
       console.log("已登录");

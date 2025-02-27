@@ -8,15 +8,15 @@ export default function NotFound() {
     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
       <Image src={Logo} alt="404" />
       <Button
-        onClick={() => {
-          navigate("/chatai");
+        onPress={() => {
+          navigate("/ai");
         }}
         variant="flat"
       >
         页面跑丢了,回到主页
       </Button>
       <Button
-        onClick={() => {
+        onPress={() => {
           setToken("");
         }}
       >

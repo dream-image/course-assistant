@@ -7,6 +7,7 @@ import {
   GetLessonInfoResponse,
   GetLessonListParams,
   GetLessonListResponse,
+  GetLessonStudentsListResponse,
   LoginInfo,
   UpdateLessonParams,
 } from "./type";
@@ -41,6 +42,9 @@ export const getAiVersions = async (): Promise<GetAiVersionsResponse> => {
 export const changeLessonCover = async (params: { lessonId: number }) => {
   return post("/cover/new/lesson", params);
 };
+export const changeUserAvatar = async () => {
+  return post("/cover/new/avatar", {});
+};
 
 export const addLesson = async (params: AddLessonParams) => {
   return post("/lesson/add", params);
@@ -67,4 +71,27 @@ export const deleteLessonFile = async (params: {
   fileName: string;
 }) => {
   return request.delete("/upload/lesson", { params });
+};
+
+export const deleteLesson = async (params: { lessonId: number }) => {
+  return request.delete("/lesson/delete", { params });
+};
+
+export const joinLesson = async (params: { lessonId: number }) => {
+  return post("/lesson/join", params);
+};
+
+export const getLessonStudentsList = async (params: {
+  lessonId: number;
+  limit: number;
+  offset: number;
+}): Promise<GetLessonStudentsListResponse> => {
+  return get("/lesson/students", params);
+};
+
+export const quitLesson = async (params: {
+  lessonId: number;
+  userId: number;
+}) => {
+  return post("/lesson/quit", params);
 };
