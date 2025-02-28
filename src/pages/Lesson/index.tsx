@@ -45,10 +45,10 @@ import {
 } from "react";
 import { useNavigate } from "react-router-dom";
 import InfiniteScroll from "@/components/InfiniteScroll";
-import { debounce, isLength, pick, throttle } from "lodash-es";
+import { debounce, pick, throttle } from "lodash-es";
 import styles from "./style.module.less";
 import dayjs from "dayjs";
-import { Col, message, Row, Space, Typography, Modal as AntdModal } from "antd";
+import { message, Typography } from "antd";
 import { UserInfoContext } from "@/context/UserInfoContext";
 import { REQUEST_BASE_URL } from "@/common/request";
 import { UserInfo } from "@/types";
@@ -60,6 +60,7 @@ import {
   ProFormText,
 } from "@ant-design/pro-components";
 import LoaderAnimation from "@/components/LoaderAnimation";
+import { getQueryFromUrl } from "@/utils";
 
 export enum ETab {
   MY_LESSON = "myLesson",
@@ -132,9 +133,14 @@ const LessonCard = forwardRef(
           )}
           radius="lg"
         >
+          {status === LessonStatus.OVER ? (
+            <div className="absolute top-0 rounded-xl z-10 left-0 w-full h-full bg-black/50 flex justify-center items-center text-white text-2xl">
+              已结束
+            </div>
+          ) : null}
           <Image
             alt={name}
-            className=" bg-cover hover:cursor-pointer w-full flex-1"
+            className=" bg-cover hover:cursor-pointer w-full flex-1 z-0"
             height={200}
             isZoomed
             src={`${REQUEST_BASE_URL}/cover/${cover}`}
@@ -373,7 +379,9 @@ const LessonCard = forwardRef(
 );
 const Lesson = () => {
   const { userInfo } = useContext(UserInfoContext);
-  const [tabKey, setTabKey] = useState<string>(ETab.MY_LESSON);
+  const [tabKey, setTabKey] = useState<string>(
+    getQueryFromUrl("tab") || ETab.MY_LESSON,
+  );
   const [searchConfig, setSearchConfig] = useState({
     limit: DEFAULT_LIMIT,
     offset: 0,
@@ -444,6 +452,7 @@ const Lesson = () => {
             variant="light"
             isVertical={true}
             isDisabled={isLoading}
+            selectedKey={tabKey}
             onSelectionChange={(e) => {
               setSearchConfig({
                 limit: DEFAULT_LIMIT,

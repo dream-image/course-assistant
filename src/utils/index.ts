@@ -33,3 +33,7 @@ export const stop = async (time: number) => {
     }, time * 1000);
   });
 };
+export const getQueryFromUrl = (key: string) => {
+  const url = new URL(window.location.href);
+  return url.searchParams.get(key);
+};

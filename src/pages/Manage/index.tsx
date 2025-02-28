@@ -52,8 +52,9 @@ import { UploadFile } from "antd/lib";
 import LoaderAnimation from "@/components/LoaderAnimation";
 import StudentShow from "@/components/StudentShow";
 import { UserInfoContext } from "@/context/UserInfoContext";
+import { ETab } from "../Lesson";
 const acceptFileExtension = ["pdf", "ppt", "pptx", "doc", "docx"];
-const DEFAULT_LIMIT = 10;
+const DEFAULT_LIMIT = 2;
 export const beforeUpload = (file: FileType) => {
   const isJpgOrPng = file.type === "image/jpeg" || file.type === "image/png";
   if (!isJpgOrPng) {
@@ -66,7 +67,7 @@ export const beforeUpload = (file: FileType) => {
   return isJpgOrPng && isLt2M;
 };
 const Manage = () => {
-  const [tabKey, setTabKey] = useState<string>("center");
+  const [tabKey, setTabKey] = useState<string>(ETab.MY_LESSON);
   const { userInfo } = useContext(UserInfoContext);
   const navigate = useNavigate();
   const params = useParams();
@@ -76,7 +77,7 @@ const Manage = () => {
   const [lessonUsers, setLessonUsers] = useState<LessonUserType[]>([]);
   const [pageInfo, setPageInfo] = useState({
     total: 0,
-    limit: 1,
+    limit: DEFAULT_LIMIT,
     offset: 0,
   });
   const [uploadFileListInModal, setUploadFileListInModal] = useState<
@@ -195,17 +196,18 @@ const Manage = () => {
           isVertical={true}
           onSelectionChange={(e) => {
             setTabKey(e.toString());
+            if (e.toString() === ETab.LESSON_CENTER) {
+              navigate(`/ai/lesson?tab=${ETab.LESSON_CENTER}`);
+            }
           }}
         >
-          <Tab key="center" title="我的课程"></Tab>
-          {/* <Tab key="myLesson" title="我教的课">
-  
-            </Tab> */}
+          <Tab key={ETab.MY_LESSON} title="我的课程"></Tab>
+          <Tab key={ETab.LESSON_CENTER} title="课程中心"></Tab>
         </Tabs>
       </div>
       <div className="w-full flex justify-start h-full">
         <Card className={`w-11/12 animate__animated  animate__fadeIn h-[95%] `}>
-          {tabKey === "center" && (
+          {tabKey === ETab.MY_LESSON && (
             <>
               <CardHeader className="pb-0">
                 <div className="flex flex-row justify-between w-full items-center">
@@ -449,7 +451,7 @@ const Manage = () => {
                         showShadow
                         className=" mt-2 ml-auto"
                         page={pageInfo.offset / pageInfo.limit}
-                        total={pageInfo.total / pageInfo.limit}
+                        total={Math.ceil(pageInfo.total / pageInfo.limit)}
                         onChange={(page) => {
                           getLessonStudents({
                             offset: (page - 1) * pageInfo.limit,

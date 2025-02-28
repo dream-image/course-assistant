@@ -107,7 +107,7 @@ const ChatAI: React.FC = () => {
             modelName: modelRef.current,
           }),
         });
-        if (response.status > 300) {
+        if (!response.ok) {
           let text = "";
           try {
             text = await response.json();
