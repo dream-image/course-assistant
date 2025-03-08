@@ -69,6 +69,7 @@ export interface Modal {
   version: string;
   url: string;
   name: string;
+  description: string;
 }
 export interface AddLessonParams {
   name: string;

@@ -31,7 +31,7 @@ const PdfPreview = (props: Props) => {
   }/${fileName}`;
 
   return (
-    <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.4.120/build/pdf.worker.min.js">
+    <Worker workerUrl={pdfjs.GlobalWorkerOptions.workerSrc}>
       <div className={cn(props.className, styles.scroll)}>
         <Viewer
           fileUrl={fileUrl}

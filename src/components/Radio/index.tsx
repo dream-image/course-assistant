@@ -1,10 +1,12 @@
 import { useEffect } from "react";
 import { Button } from "@heroui/react";
 import styles from "./style.module.css";
+import { Tooltip } from "antd";
 type Props = {
   list: {
     value: string;
     label: string;
+    description?: string;
   }[];
   defaultValue?: string | null;
   value?: string;
@@ -24,14 +26,23 @@ const CustomeButtonRadioGroup = (props: Props) => {
   return (
     <div style={style} className={className}>
       {list.map((i) => (
-        <Button
-          key={i.value}
-          onClick={() => onSelect(i.value)}
-          variant="bordered"
-          className={`${i.value === value ? styles.active : ""}`}
+        <Tooltip
+          title={i.description}
+          arrow={false}
+          overlayInnerStyle={{
+            color: "black",
+            backgroundColor: "#fff",
+          }}
         >
-          {i.label}
-        </Button>
+          <Button
+            key={i.value}
+            onPress={() => onSelect(i.value)}
+            variant="bordered"
+            className={`${i.value === value ? styles.active : ""}`}
+          >
+            {i.label}
+          </Button>
+        </Tooltip>
       ))}
     </div>
   );

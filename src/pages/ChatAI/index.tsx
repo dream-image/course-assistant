@@ -450,11 +450,11 @@ const ChatAI: React.FC = () => {
             >
               {modelBarVisible ? (
                 <>
-                  <div className=" max-w-[650px] overflow-auto">
+                  <div className=" max-w-[650px] overflow-auto no-scrollbar">
                     <CustomeButtonRadioGroup
                       defaultValue={defaultModalName}
                       value={model?.name}
-                      className="flex gap-3 flex-none max-w-max"
+                      className="flex gap-3 flex-none max-w-max w-max"
                       onSelect={(v) => {
                         localStorage.setItem("defaultModalName", v || "");
                         setModal(modelList.find((i) => i.name === v));
@@ -463,6 +463,7 @@ const ChatAI: React.FC = () => {
                         return {
                           label: i.name,
                           value: i.name,
+                          description: i.description,
                         };
                       })}
                     ></CustomeButtonRadioGroup>
