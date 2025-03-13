@@ -155,6 +155,20 @@ const Info = () => {
                     }}
                   />
                   <ProDescriptions.Item
+                    dataIndex={["info", "email"]}
+                    label="邮箱"
+                    valueType="text"
+                    formItemProps={{
+                      rules: [
+                        {
+                          message: "请输入正确的邮箱",
+                          pattern:
+                            /^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+((\.[a-zA-Z0-9_-]{2,3}){1,2})$/,
+                        },
+                      ],
+                    }}
+                  />
+                  <ProDescriptions.Item
                     label="id"
                     dataIndex={["info", "userid"]}
                     valueType="text"
