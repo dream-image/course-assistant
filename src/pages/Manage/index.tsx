@@ -190,11 +190,6 @@ const Manage = () => {
   };
   useEffect(() => {
     init();
-    console.log(
-      Math.ceil(accordionRef?.current?.getBoundingClientRect()?.width || 48) -
-        48,
-    );
-
     setAccordionWidth(
       Math.ceil(accordionRef?.current?.getBoundingClientRect()?.width || 48) -
         48,
@@ -259,6 +254,12 @@ const Manage = () => {
                         "w-full rounded-lg flex items-center justify-between gap-3 ",
                         isMobile ? "flex-col h-max" : "h-[206px] ",
                       )}
+                      style={{
+                        transform:
+                          document.body.clientWidth < 420
+                            ? `scale(${document.body.clientWidth / 420})`
+                            : "",
+                      }}
                     >
                       <div className="relative ">
                         <Image

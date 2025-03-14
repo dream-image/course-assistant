@@ -480,7 +480,7 @@ const Lesson = () => {
             <>
               <Card className={`w-11/12   animate-opacity h-[95%] `}>
                 <CardHeader>
-                  <div className="flex flex-row justify-between w-full items-center">
+                  <div className="flex flex-row justify-between w-full items-center flex-wrap gap-3">
                     <div className="flex-1">
                       <Breadcrumbs
                         itemClasses={{

@@ -55,10 +55,10 @@ const LessonFileCard = (props: Props) => {
   return (
     <>
       <div
-        className=" group/item w-40 h-28 shadow-2xl rounded-lg transition-all duration-300 ease-in-out flex-grow max-w-[200px] relative animate-opacity"
+        className=" flex-grow  group/item w-40 h-28 shadow-2xl rounded-lg transition-all duration-300 ease-in-out max-w-[250px]  relative animate-opacity"
         ref={wrapperRef}
       >
-        <div className="absolute w-full h-full opacity-70 hidden group-hover/item:block bg-black  rounded-xl z-[40]">
+        <div className=" absolute w-full h-full opacity-70 hidden group-hover/item:block bg-black  rounded-xl z-[40]">
           {wrapperRef.current
             ? createPortal(
                 <div className=" z-50 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 group-hover/item:flex hidden gap-1">
@@ -149,10 +149,9 @@ const LessonFileCard = (props: Props) => {
         </div>
         <Card isFooterBlurred className="border-none" radius="lg">
           <Image
-            className=""
             classNames={{
               wrapper: cn(
-                "w-full flex justify-center items-center",
+                "w-full flex  justify-center items-center",
                 styles.maxWidth,
               ),
             }}
