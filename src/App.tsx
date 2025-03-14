@@ -1,5 +1,5 @@
 import { Spinner } from "@heroui/react";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { authRouter, NotAuthRouterList } from "./router";
 import { UserInfoContext } from "./context/UserInfoContext";
@@ -8,6 +8,7 @@ import { getUserInfo } from "./api";
 import { autoRefreshToken } from "./utils/autoRefreshToken";
 import { message } from "antd";
 import { PermissionEnum } from "./common/permission";
+import { PageLoading } from "@ant-design/pro-components";
 
 function App() {
   const [userInfo, setUserInfo] = useState<UserInfo>({} as UserInfo);
@@ -58,9 +59,11 @@ function App() {
             },
           }}
         >
-          <RouterProvider
-            router={createBrowserRouter(authRouter(userInfo.uGroup ?? []))}
-          ></RouterProvider>
+          <Suspense fallback={<PageLoading />}>
+            <RouterProvider
+              router={createBrowserRouter(authRouter(userInfo.uGroup ?? []))}
+            ></RouterProvider>
+          </Suspense>
         </UserInfoContext.Provider>
       )}
     </>

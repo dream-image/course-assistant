@@ -1,29 +1,27 @@
 import { Navigate, RouteObject } from "react-router-dom";
 import NotFound from "@/pages/NotFound";
 import Login from "./pages/Login";
-import ChatAI from "./pages/ChatAI";
-import Lesson from "./pages/Lesson";
-import Manage from "./pages/Manage";
 import Home from "./pages/Home";
 import Info from "./pages/Info";
 import Register from "./pages/Register";
+import { lazy } from "react";
 
 export const NotAuthRouterList = ["register", "login"];
 
 export const router: RouteObject[] = [
   {
     path: "lesson",
-    element: <Lesson />,
+    Component: lazy(() => import("./pages/Lesson")),
     id: "lesson",
   },
   {
     path: "chat/:id",
-    element: <ChatAI />,
+    Component: lazy(() => import("./pages/ChatAI")),
     id: "chatai",
   },
   {
     path: "manage/:id",
-    element: <Manage />,
+    Component: lazy(() => import("./pages/Manage")),
     id: "manage",
   },
 ];

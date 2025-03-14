@@ -5,7 +5,9 @@ export type BaseResponse<T> = {
   error_msg: string;
   data: T;
 };
-export const REQUEST_BASE_URL = "http://localhost:8888";
+const env = location.host.includes("localhost") ? "dev" : "prod";
+export const REQUEST_BASE_URL =
+  env === "dev" ? "http://localhost:8888" : "http://47.98.129.119:8888";
 const request = axios.create({
   baseURL: REQUEST_BASE_URL,
   timeout: 30000,
