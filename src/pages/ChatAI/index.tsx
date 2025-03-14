@@ -294,7 +294,7 @@ const ChatAI: React.FC = () => {
                   variant="light"
                   color="default"
                   isIconOnly
-                  onClick={() => {
+                  onPress={() => {
                     navigator.clipboard.writeText(_message);
                     message.success("复制成功");
                   }}
@@ -482,7 +482,7 @@ const ChatAI: React.FC = () => {
                         }
                       : {}
                   }
-                  onClick={() => {
+                  onPress={() => {
                     setModalBarVisible(!modelBarVisible);
                   }}
                 >

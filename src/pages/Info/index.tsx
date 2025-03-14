@@ -42,13 +42,18 @@ import { isMatch, isUndefined } from "lodash-es";
 import { CameraOutlined, UploadOutlined } from "@ant-design/icons";
 import styles from "./style.module.less";
 import { beforeUpload } from "../Manage";
-import { FileType, getBase64, getToken } from "@/utils";
+import { FileType, getBase64, getQueryFromUrl, getToken } from "@/utils";
 import { changeUserAvatar, getUserInfo } from "@/api";
 import { PermissionEnum } from "@/common/permission";
+import { MobileContext } from "@/context/MobileContext";
+import { ETab } from "../Lesson";
 const Info = () => {
   const navigate = useNavigate();
   const { userInfo, setUserInfoContext } = useContext(UserInfoContext);
-  const [tabKey, setTabKey] = useState<string>("info");
+  const [tabKey, setTabKey] = useState<string>(
+    getQueryFromUrl("tab") || ETab.INFO,
+  );
+  const { isMobile } = useContext(MobileContext);
   const actionRef = useRef<ProDescriptionsActionType>();
   const [isCoverLoading, setIsCoverLoading] = useState<boolean>(false);
   const [percent, setPercent] = useState<number>(0);
@@ -56,24 +61,26 @@ const Info = () => {
   const [form] = Form.useForm();
   return (
     <div className=" w-[1680px] h-full flex ml-4 relative">
-      <div className="h-full mr-8 hover:bg-indigo-50 hover:shadow-sky-100 hover:shadow-md transition-all w-max rounded-xl">
-        <Tabs
-          aria-label="Options"
-          variant="light"
-          isVertical={true}
-          onSelectionChange={(e) => {
-            setTabKey(e.toString());
-            setPercent(0);
-            form.resetFields();
-          }}
-        >
-          <Tab key="info" title="基本资料"></Tab>
-          <Tab key="password" title="密码管理"></Tab>
-        </Tabs>
-      </div>
+      {!isMobile ? (
+        <div className="h-full mr-8 hover:bg-indigo-50 hover:shadow-sky-100 hover:shadow-md transition-all w-max rounded-xl">
+          <Tabs
+            aria-label="Options"
+            variant="light"
+            isVertical={true}
+            onSelectionChange={(e) => {
+              setTabKey(e.toString());
+              setPercent(0);
+              form.resetFields();
+            }}
+          >
+            <Tab key={ETab.INFO} title="基本资料"></Tab>
+            <Tab key={ETab.PASSWORD} title="密码管理"></Tab>
+          </Tabs>
+        </div>
+      ) : null}
       <div className="w-full flex justify-start">
         <Card className={`w-11/12 animate__animated  animate__fadeIn h-max`}>
-          {tabKey === "info" && (
+          {tabKey === ETab.INFO && (
             <>
               <CardHeader className="flex gap-3 ">
                 <div className="relative">
@@ -222,13 +229,13 @@ const Info = () => {
               <Divider />
             </>
           )}
-          {tabKey === "password" && (
+          {tabKey === ETab.PASSWORD && (
             <>
               <CardHeader>
                 <span>更改密码</span>
               </CardHeader>
               <Divider />
-              <CardBody>
+              <CardBody className="no-scrollbar ">
                 <Form
                   className="w-72"
                   labelCol={{ span: 10 }}
@@ -258,7 +265,9 @@ const Info = () => {
                       setPercent(score);
                     }
                   }}
-                  onFinish={(values) => {}}
+                  onFinish={(values) => {
+                    console.log("修改密码");
+                  }}
                 >
                   <Form.Item
                     rules={[

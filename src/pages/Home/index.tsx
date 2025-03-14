@@ -2,18 +2,24 @@ import {
   Avatar,
   Button,
   Chip,
+  cn,
   Divider,
-  Dropdown,
-  DropdownTrigger,
   Image,
+  Link,
+  Navbar,
+  NavbarBrand,
+  NavbarContent,
+  NavbarItem,
+  NavbarMenu,
+  NavbarMenuItem,
+  NavbarMenuToggle,
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@heroui/react";
 import { Outlet, useNavigate } from "react-router-dom";
 import background from "@/assets/background.png";
-import image from "@/assets/头像.png";
-import { useContext } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { UserInfoContext } from "@/context/UserInfoContext";
 import { DownOutlined } from "@ant-design/icons";
 import { UserInfo } from "@/types";
@@ -22,6 +28,9 @@ import hduLogo from "@/assets/hdulogo.png";
 import legal from "@/assets/官方认证.svg";
 import { setToken } from "@/utils";
 import { REQUEST_BASE_URL } from "@/common/request";
+import { debounce } from "lodash-es";
+import { MobileContext } from "@/context/MobileContext";
+import { ETab } from "../Lesson";
 const RoleTag = (props: {
   userInfo?: UserInfo;
   text?: string;
@@ -102,10 +111,30 @@ const nav = [
     path: "info",
   },
 ];
+const menuItems = [
+  {
+    name: "我的课程",
+    url: "/ai/lesson",
+  },
+  {
+    name: "课程中心",
+    url: "/ai/lesson?tab=" + ETab.LESSON_CENTER,
+  },
+  {
+    name: "基础资料",
+    url: "/ai/info?tab=" + ETab.INFO,
+  },
+  {
+    name: "修改密码",
+    url: "/ai/info?tab=" + ETab.PASSWORD,
+  },
+];
+
 const Home = () => {
   const navigate = useNavigate();
   const { userInfo } = useContext(UserInfoContext);
-  console.log("userInfo", userInfo);
+  const { isMobile } = useContext(MobileContext);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
     <div
@@ -113,77 +142,173 @@ const Home = () => {
       style={{ backgroundImage: `url(${background})` }}
     >
       <div className="fixed top-0 w-full h-[76px] border-b-1 border-blue-50  flex justify-center">
-        <div className="w-[1680px] flex">
-          <div className="flex  items-center w-max ml-4 h-full">
-            <Image src="/logo.svg" alt="天书" width={50} height={50} />
-            <span className="font-semibold font-kai text-2xl text-gray-700">
-              天书
-            </span>
-          </div>
-          <div className="flex-1 ml-8 flex items-center">
-            {nav
-              .filter(
-                (item) =>
-                  item.key.includes("all") || item.key.includes(userInfo?.role),
-              )
-              .map((item) => {
-                return (
-                  <div className="flex h-[40px]" key={item.name}>
-                    <Divider className=" h-full" orientation="vertical" />
-                    <Button
-                      className=""
-                      radius="none"
-                      variant="light"
-                      onClick={() => {
-                        navigate(item.path);
-                      }}
+        {isMobile ? (
+          <div className="w-full flex">
+            <Navbar
+              onMenuOpenChange={setIsMobileMenuOpen}
+              className=" w-full absolute bg-transparent"
+              classNames={{
+                wrapper: "pr-0",
+              }}
+            >
+              <NavbarContent>
+                <NavbarMenuToggle
+                  aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
+                  className="sm:hidden"
+                />
+                <div
+                  className={cn(
+                    "flex  items-center w-max ml-4 h-full",
+                    isMobile ? "flex-1" : "",
+                  )}
+                >
+                  <Image src="/logo.svg" alt="天书" width={50} height={50} />
+                  <span className="font-semibold font-kai text-2xl text-gray-700 flex-1">
+                    天书
+                  </span>
+                  <Popover placement="bottom" showArrow offset={0}>
+                    <PopoverTrigger className="mr-6">
+                      <div className="h-full flex items-center gap-2 cursor-pointer">
+                        <AvatarInfo userInfo={userInfo}></AvatarInfo>
+                      </div>
+                    </PopoverTrigger>
+                    <PopoverContent>
+                      <div className="min-w-[200px] w-min flex flex-col  gap-2 justify-center">
+                        <div className="flex justify-between ">
+                          <div className="flex gap-2 ">
+                            <AvatarInfo
+                              userInfo={userInfo}
+                              hasIcon={false}
+                              widthFlex={false}
+                            ></AvatarInfo>
+                          </div>
+                          <Button
+                            variant="flat"
+                            className="min-w-5 font-medium ml-2"
+                            onPress={() => {
+                              //@ts-expect-error
+                              window?.refreshToken &&
+                                //@ts-expect-error
+                                clearTimeout(window.refreshToken);
+                              setTimeout(() => {
+                                setToken("");
+                                navigate("/login");
+                              }, 300);
+                            }}
+                          >
+                            退出
+                          </Button>
+                        </div>
+                        <div className="flex flex-wrap gap-2 items-center justify-start ">
+                          <RoleTag
+                            text="杭州电子科技大学"
+                            icon={hduLogo}
+                          ></RoleTag>
+                          <RoleTag userInfo={userInfo}></RoleTag>
+                          <RoleTag text="官方认证" icon={legal}></RoleTag>
+                        </div>
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+                </div>
+              </NavbarContent>
+              <NavbarMenu>
+                {menuItems.map((item, index) => (
+                  <NavbarMenuItem key={`${item}-${index}`}>
+                    <Link
+                      className="w-full"
+                      color={
+                        location.href.endsWith(item.url)
+                          ? "primary"
+                          : "foreground"
+                      }
+                      href={item.url}
+                      size="lg"
                     >
                       {item.name}
+                    </Link>
+                  </NavbarMenuItem>
+                ))}
+              </NavbarMenu>
+            </Navbar>
+          </div>
+        ) : (
+          <div className="w-[1680px] flex">
+            <div className={cn("flex  items-center w-max ml-4 h-full")}>
+              <Image src="/logo.svg" alt="天书" width={50} height={50} />
+              <span className="font-semibold font-kai text-2xl text-gray-700 flex-1">
+                天书
+              </span>
+            </div>
+            <div className="flex-1 ml-8 flex items-center">
+              {nav
+                .filter(
+                  (item) =>
+                    item.key.includes("all") ||
+                    item.key.includes(userInfo?.role),
+                )
+                .map((item) => {
+                  return (
+                    <div className="flex h-[40px]" key={item.name}>
+                      <Divider className=" h-full" orientation="vertical" />
+                      <Button
+                        className=""
+                        radius="none"
+                        variant="light"
+                        onPress={() => {
+                          navigate(item.path);
+                        }}
+                      >
+                        {item.name}
+                      </Button>
+                    </div>
+                  );
+                })}
+            </div>
+
+            <Popover placement="bottom" showArrow offset={0}>
+              <PopoverTrigger className="mr-6">
+                <div className="h-full flex items-center gap-2 cursor-pointer">
+                  <AvatarInfo userInfo={userInfo}></AvatarInfo>
+                </div>
+              </PopoverTrigger>
+              <PopoverContent>
+                <div className="min-w-[200px] w-min flex flex-col  gap-2 justify-center">
+                  <div className="flex justify-between ">
+                    <div className="flex gap-2 ">
+                      <AvatarInfo
+                        userInfo={userInfo}
+                        hasIcon={false}
+                        widthFlex={false}
+                      ></AvatarInfo>
+                    </div>
+                    <Button
+                      variant="flat"
+                      className="min-w-5 font-medium ml-2"
+                      onPress={() => {
+                        //@ts-expect-error
+                        window?.refreshToken &&
+                          //@ts-expect-error
+                          clearTimeout(window.refreshToken);
+                        setTimeout(() => {
+                          setToken("");
+                          navigate("/login");
+                        }, 300);
+                      }}
+                    >
+                      退出
                     </Button>
                   </div>
-                );
-              })}
-          </div>
-          <Popover placement="bottom" showArrow offset={0}>
-            <PopoverTrigger className="mr-6">
-              <div className="h-full flex items-center gap-2 cursor-pointer">
-                <AvatarInfo userInfo={userInfo}></AvatarInfo>
-              </div>
-            </PopoverTrigger>
-            <PopoverContent>
-              <div className="min-w-[200px] w-min flex flex-col  gap-2 justify-center">
-                <div className="flex justify-between ">
-                  <div className="flex gap-2 ">
-                    <AvatarInfo
-                      userInfo={userInfo}
-                      hasIcon={false}
-                      widthFlex={false}
-                    ></AvatarInfo>
+                  <div className="flex flex-wrap gap-2 items-center justify-start ">
+                    <RoleTag text="杭州电子科技大学" icon={hduLogo}></RoleTag>
+                    <RoleTag userInfo={userInfo}></RoleTag>
+                    <RoleTag text="官方认证" icon={legal}></RoleTag>
                   </div>
-                  <Button
-                    variant="flat"
-                    className="min-w-5 font-medium ml-2"
-                    onClick={() => {
-                      //@ts-expect-error
-                      window.refreshToken && clearTimeout(window.refreshToken);
-                      setTimeout(() => {
-                        setToken("");
-                        navigate("/login");
-                      }, 300);
-                    }}
-                  >
-                    退出
-                  </Button>
                 </div>
-                <div className="flex flex-wrap gap-2 items-center justify-start ">
-                  <RoleTag text="杭州电子科技大学" icon={hduLogo}></RoleTag>
-                  <RoleTag userInfo={userInfo}></RoleTag>
-                  <RoleTag text="官方认证" icon={legal}></RoleTag>
-                </div>
-              </div>
-            </PopoverContent>
-          </Popover>
-        </div>
+              </PopoverContent>
+            </Popover>
+          </div>
+        )}
       </div>
       <div
         className="absolute flex justify-center top-[76px]"

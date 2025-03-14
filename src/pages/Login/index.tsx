@@ -103,7 +103,7 @@ const Login = () => {
           <div className="w-full flex justify-between mt-2">
             <Link
               className="text-sm text-sky-400 hover:text-sky-600 hover:cursor-pointer"
-              onClick={() => {
+              onPress={() => {
                 navigate("/register");
               }}
             >
@@ -111,7 +111,7 @@ const Login = () => {
             </Link>
             <Link
               className="text-sm text-gray-500 hover:text-sky-600 hover:cursor-pointer"
-              onClick={() => {}}
+              onPress={() => {}}
             >
               忘记密码？
             </Link>
@@ -120,7 +120,7 @@ const Login = () => {
             <Button
               color="primary"
               className="bg-gradient-to-tr from-blue-200 to-sky-500 text-white shadow-lg w-full"
-              onClick={() => {
+              onPress={() => {
                 loginFn();
               }}
             >

@@ -90,7 +90,7 @@ const Register: React.FC = () => {
                   size="lg"
                   className="flex-grow"
                 />
-                <Button onClick={handleGetSmsCode}>获取验证码</Button>
+                <Button onPress={handleGetSmsCode}>获取验证码</Button>
               </div>
             </Form.Item>
 

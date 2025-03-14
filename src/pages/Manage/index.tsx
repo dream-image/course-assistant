@@ -53,6 +53,7 @@ import LoaderAnimation from "@/components/LoaderAnimation";
 import StudentShow from "@/components/StudentShow";
 import { UserInfoContext } from "@/context/UserInfoContext";
 import { ETab } from "../Lesson";
+import { MobileContext } from "@/context/MobileContext";
 const acceptFileExtension = ["pdf", "ppt", "pptx", "doc", "docx"];
 const DEFAULT_LIMIT = 2;
 export const beforeUpload = (file: FileType) => {
@@ -72,14 +73,17 @@ const Manage = () => {
   const navigate = useNavigate();
   const params = useParams();
   const [lesson, setLesson] = useState<LessonType>();
+  const { isMobile } = useContext(MobileContext);
   const [isLoading, setIsLoading] = useState(false);
   const [lessonFiles, setLessonFiles] = useState<LessonFile[]>([]);
   const [lessonUsers, setLessonUsers] = useState<LessonUserType[]>([]);
+  const [accordionWidth, setAccordionWidth] = useState<number>(0);
   const [pageInfo, setPageInfo] = useState({
     total: 0,
     limit: DEFAULT_LIMIT,
     offset: 0,
   });
+  const accordionRef = useRef<HTMLDivElement>(null);
   const [uploadFileListInModal, setUploadFileListInModal] = useState<
     UploadFile[]
   >([]);
@@ -186,25 +190,36 @@ const Manage = () => {
   };
   useEffect(() => {
     init();
+    console.log(
+      Math.ceil(accordionRef?.current?.getBoundingClientRect()?.width || 48) -
+        48,
+    );
+
+    setAccordionWidth(
+      Math.ceil(accordionRef?.current?.getBoundingClientRect()?.width || 48) -
+        48,
+    );
   }, []);
   return (
     <div className=" w-[1680px] h-full flex ml-4 relative">
-      <div className="h-full mr-8 hover:bg-indigo-50 hover:shadow-sky-100 hover:shadow-md transition-all w-max rounded-xl">
-        <Tabs
-          aria-label="Options"
-          variant="light"
-          isVertical={true}
-          onSelectionChange={(e) => {
-            setTabKey(e.toString());
-            if (e.toString() === ETab.LESSON_CENTER) {
-              navigate(`/ai/lesson?tab=${ETab.LESSON_CENTER}`);
-            }
-          }}
-        >
-          <Tab key={ETab.MY_LESSON} title="我的课程"></Tab>
-          <Tab key={ETab.LESSON_CENTER} title="课程中心"></Tab>
-        </Tabs>
-      </div>
+      {!isMobile ? (
+        <div className="h-full mr-8 hover:bg-indigo-50 hover:shadow-sky-100 hover:shadow-md transition-all w-max rounded-xl">
+          <Tabs
+            aria-label="Options"
+            variant="light"
+            isVertical={true}
+            onSelectionChange={(e) => {
+              setTabKey(e.toString());
+              if (e.toString() === ETab.LESSON_CENTER) {
+                navigate(`/ai/lesson?tab=${ETab.LESSON_CENTER}`);
+              }
+            }}
+          >
+            <Tab key={ETab.MY_LESSON} title="我的课程"></Tab>
+            <Tab key={ETab.LESSON_CENTER} title="课程中心"></Tab>
+          </Tabs>
+        </div>
+      ) : null}
       <div className="w-full flex justify-start h-full">
         <Card className={`w-11/12 animate__animated  animate__fadeIn h-[95%] `}>
           {tabKey === ETab.MY_LESSON && (
@@ -236,10 +251,16 @@ const Manage = () => {
                   variant="splitted"
                   defaultExpandedKeys={["1"]}
                   selectionMode="multiple"
+                  ref={accordionRef}
                 >
                   <AccordionItem key="1" aria-label="课程信息" title="课程信息">
-                    <div className="w-full rounded-lg flex items-center justify-between gap-3 h-[206px]">
-                      <div className=" relative ">
+                    <div
+                      className={cn(
+                        "w-full rounded-lg flex items-center justify-between gap-3 ",
+                        isMobile ? "flex-col h-max" : "h-[206px] ",
+                      )}
+                    >
+                      <div className="relative ">
                         <Image
                           alt={"封面"}
                           className=" bg-contain min-w-[300px] flex-1"
@@ -256,7 +277,7 @@ const Manage = () => {
                             variant="light"
                             size="sm"
                             className="mix-blend-hard-light"
-                            onClick={() => {
+                            onPress={() => {
                               onOpen();
                             }}
                           >
@@ -439,27 +460,32 @@ const Manage = () => {
                     )}
                   </AccordionItem>
                   <AccordionItem key="3" aria-label="用户列表" title="用户列表">
-                    <StudentShow
-                      lessonInfo={lesson}
-                      userId={userInfo.userid}
-                      users={lessonUsers}
-                      refreshLessonStudents={refreshLessonStudents}
-                    ></StudentShow>
-                    {pageInfo.total / pageInfo.limit > 1 ? (
-                      <Pagination
-                        showControls
-                        showShadow
-                        className=" mt-2 ml-auto"
-                        page={pageInfo.offset / pageInfo.limit}
-                        total={Math.ceil(pageInfo.total / pageInfo.limit)}
-                        onChange={(page) => {
-                          getLessonStudents({
-                            offset: (page - 1) * pageInfo.limit,
-                            limit: pageInfo.limit,
-                          });
-                        }}
-                      />
-                    ) : null}
+                    <div
+                      className={cn(`overflow-auto  no-scrollbar`)}
+                      style={{ width: accordionWidth }}
+                    >
+                      <StudentShow
+                        lessonInfo={lesson}
+                        userId={userInfo.userid}
+                        users={lessonUsers}
+                        refreshLessonStudents={refreshLessonStudents}
+                      ></StudentShow>
+                      {pageInfo.total / pageInfo.limit > 1 ? (
+                        <Pagination
+                          showControls
+                          showShadow
+                          className=" mt-2 ml-auto"
+                          page={pageInfo.offset / pageInfo.limit}
+                          total={Math.ceil(pageInfo.total / pageInfo.limit)}
+                          onChange={(page) => {
+                            getLessonStudents({
+                              offset: (page - 1) * pageInfo.limit,
+                              limit: pageInfo.limit,
+                            });
+                          }}
+                        />
+                      ) : null}
+                    </div>
                   </AccordionItem>
                 </Accordion>
               </CardBody>

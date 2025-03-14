@@ -1,5 +1,5 @@
 import { Spinner } from "@heroui/react";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { authRouter, NotAuthRouterList } from "./router";
 import { UserInfoContext } from "./context/UserInfoContext";
@@ -9,10 +9,41 @@ import { autoRefreshToken } from "./utils/autoRefreshToken";
 import { message } from "antd";
 import { PermissionEnum } from "./common/permission";
 import { PageLoading } from "@ant-design/pro-components";
+import { MobileContext } from "./context/MobileContext";
+import { debounce } from "lodash-es";
 
 function App() {
   const [userInfo, setUserInfo] = useState<UserInfo>({} as UserInfo);
+  const [isMobile, setIsMobile] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const observe = useMemo(() => {
+    return new ResizeObserver(
+      debounce(
+        (entries) => {
+          const bodyEntries = entries?.[0];
+          if (bodyEntries) {
+            const body = bodyEntries.target;
+            const width = body.clientWidth;
+            if (width < 1000) {
+              setIsMobile(true);
+            } else {
+              setIsMobile(false);
+            }
+          }
+        },
+        1000,
+        {
+          leading: true,
+        },
+      ),
+    );
+  }, []);
+  useEffect(() => {
+    observe.observe(document.body);
+    return () => {
+      observe.unobserve(document.body);
+    };
+  }, []);
   const init = async () => {
     try {
       setIsLoading(true);
@@ -51,20 +82,27 @@ function App() {
       {isLoading ? (
         <Spinner></Spinner>
       ) : (
-        <UserInfoContext.Provider
+        <MobileContext.Provider
           value={{
-            userInfo,
-            setUserInfoContext: (props) => {
-              setUserInfo(props);
-            },
+            isMobile,
+            setIsMobile,
           }}
         >
-          <Suspense fallback={<PageLoading />}>
-            <RouterProvider
-              router={createBrowserRouter(authRouter(userInfo.uGroup ?? []))}
-            ></RouterProvider>
-          </Suspense>
-        </UserInfoContext.Provider>
+          <UserInfoContext.Provider
+            value={{
+              userInfo,
+              setUserInfoContext: (props) => {
+                setUserInfo(props);
+              },
+            }}
+          >
+            <Suspense fallback={<PageLoading />}>
+              <RouterProvider
+                router={createBrowserRouter(authRouter(userInfo.uGroup ?? []))}
+              ></RouterProvider>
+            </Suspense>
+          </UserInfoContext.Provider>
+        </MobileContext.Provider>
       )}
     </>
   );

@@ -61,10 +61,13 @@ import {
 } from "@ant-design/pro-components";
 import LoaderAnimation from "@/components/LoaderAnimation";
 import { getQueryFromUrl } from "@/utils";
+import { MobileContext } from "@/context/MobileContext";
 
 export enum ETab {
   MY_LESSON = "myLesson",
   LESSON_CENTER = "lessonCenter",
+  INFO = "info",
+  PASSWORD = "password",
 }
 const DEFAULT_LIMIT = 5;
 const LessonCard = forwardRef(
@@ -256,7 +259,7 @@ const LessonCard = forwardRef(
                   radius="lg"
                   size="sm"
                   variant="flat"
-                  onClick={() => {
+                  onPress={() => {
                     navigate(`/ai/chat/${lessonId}`);
                   }}
                 >
@@ -270,7 +273,7 @@ const LessonCard = forwardRef(
                 radius="lg"
                 size="sm"
                 variant="flat"
-                onClick={() => {
+                onPress={() => {
                   navigate(`/ai/manage/${lessonId}`);
                 }}
               >
@@ -379,6 +382,7 @@ const LessonCard = forwardRef(
 );
 const Lesson = () => {
   const { userInfo } = useContext(UserInfoContext);
+  const { isMobile } = useContext(MobileContext);
   const [tabKey, setTabKey] = useState<string>(
     getQueryFromUrl("tab") || ETab.MY_LESSON,
   );
@@ -446,29 +450,31 @@ const Lesson = () => {
   return (
     <>
       <div className=" w-[1680px] h-full flex ml-4 relative">
-        <div className="h-full mr-8 hover:bg-indigo-50 hover:shadow-sky-100 hover:shadow-md transition-all w-max rounded-xl">
-          <Tabs
-            aria-label="Options"
-            variant="light"
-            isVertical={true}
-            isDisabled={isLoading}
-            selectedKey={tabKey}
-            onSelectionChange={(e) => {
-              setSearchConfig({
-                limit: DEFAULT_LIMIT,
-                offset: 0,
-                total: 0,
-                hasMore: true,
-                lessonName: "",
-              });
-              setLessonList([]);
-              setTabKey(e.toString());
-            }}
-          >
-            <Tab key={ETab.MY_LESSON} title="我的课程"></Tab>
-            <Tab key={ETab.LESSON_CENTER} title="课程中心"></Tab>
-          </Tabs>
-        </div>
+        {!isMobile ? (
+          <div className="h-full mr-8 hover:bg-indigo-50 hover:shadow-sky-100 hover:shadow-md transition-all w-max rounded-xl">
+            <Tabs
+              aria-label="Options"
+              variant="light"
+              isVertical={true}
+              isDisabled={isLoading}
+              selectedKey={tabKey}
+              onSelectionChange={(e) => {
+                setSearchConfig({
+                  limit: DEFAULT_LIMIT,
+                  offset: 0,
+                  total: 0,
+                  hasMore: true,
+                  lessonName: "",
+                });
+                setLessonList([]);
+                setTabKey(e.toString());
+              }}
+            >
+              <Tab key={ETab.MY_LESSON} title="我的课程"></Tab>
+              <Tab key={ETab.LESSON_CENTER} title="课程中心"></Tab>
+            </Tabs>
+          </div>
+        ) : null}
         <div className="w-full flex justify-start h-full">
           {tabKey === ETab.MY_LESSON && (
             <>
