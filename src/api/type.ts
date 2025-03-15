@@ -1,6 +1,8 @@
 export type LoginInfo = {
   username?: string;
   password?: string;
+  phoneNumber?: string;
+  code?: string;
 };
 
 export interface GetLessonListParams {

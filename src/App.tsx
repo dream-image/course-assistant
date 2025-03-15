@@ -24,7 +24,7 @@ function App() {
           if (bodyEntries) {
             const body = bodyEntries.target;
             const width = body.clientWidth;
-            if (width < 1000) {
+            if (width < 500) {
               setIsMobile(true);
             } else {
               setIsMobile(false);

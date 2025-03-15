@@ -28,7 +28,7 @@ import {
 import { UserInfoContext } from "@/context/UserInfoContext";
 import { post, REQUEST_BASE_URL } from "@/common/request";
 import { Form, Input, message, Progress, Upload } from "antd";
-import { isMatch, isUndefined } from "lodash-es";
+import { isMatch, isUndefined, pick } from "lodash-es";
 import { CameraOutlined, UploadOutlined } from "@ant-design/icons";
 import styles from "./style.module.less";
 import { beforeUpload } from "../Manage";
@@ -97,7 +97,13 @@ const Info = () => {
                       success: true,
                       data: {
                         info: {
-                          ...userInfo,
+                          ...pick(userInfo, [
+                            "nickname",
+                            "email",
+                            "userid",
+                            "role",
+                            "school",
+                          ]),
                           sex: userInfo.sex?.toString(),
                         },
                       },
@@ -154,6 +160,7 @@ const Info = () => {
                     label="邮箱"
                     valueType="text"
                     formItemProps={{
+                      initialValue: userInfo.email || "",
                       rules: [
                         {
                           message: "请输入正确的邮箱",

@@ -18,7 +18,9 @@ export const refreshToken = async () => {
 export const getUserInfo = async () => {
   return get<UserInfo>("/userInfo");
 };
-export const login = async (params: LoginInfo) => {
+export const login = async (
+  params: LoginInfo & { isLoginByPhone?: boolean },
+) => {
   return request.post("/login", params);
 };
 
@@ -94,4 +96,8 @@ export const quitLesson = async (params: {
   userId: number;
 }) => {
   return post("/lesson/quit", params);
+};
+
+export const sendVerifyCode = async (params: { phone: string }) => {
+  return post("/verifyCode", params);
 };
