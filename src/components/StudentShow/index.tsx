@@ -8,8 +8,6 @@ import {
   TableCell,
   User,
   Chip,
-  Tooltip,
-  cn,
   Popover,
   PopoverTrigger,
   PopoverContent,

@@ -1,5 +1,5 @@
-import React, { Component, ReactNode, CSSProperties } from "react";
-import { remove, throttle } from "lodash-es";
+import { Component, ReactNode, CSSProperties } from "react";
+import { throttle } from "lodash-es";
 export const ThresholdUnits = {
   Pixel: "Pixel",
   Percent: "Percent",

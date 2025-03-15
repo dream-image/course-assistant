@@ -1,8 +1,6 @@
 import { addLesson, deleteLesson, getLessonList, joinLesson } from "@/api";
 import { LessonStatus, LessonStatusMap, LessonType } from "@/api/type";
 import {
-  CloseSquareOutlined,
-  DeleteOutlined,
   EllipsisOutlined,
   ExclamationCircleOutlined,
   SearchOutlined,
@@ -22,7 +20,6 @@ import {
   DropdownTrigger,
   Image,
   Input,
-  Spinner,
   Tab,
   Tabs,
   Breadcrumbs,

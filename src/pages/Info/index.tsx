@@ -9,7 +9,6 @@ import {
   cn,
   commonColors,
   Divider,
-  Image,
   Modal,
   ModalBody,
   ModalContent,
@@ -20,8 +19,6 @@ import {
   useDisclosure,
 } from "@heroui/react";
 import { useContext, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import image from "@/assets/头像.png";
 import {
   FormControlRender,
   ProDescriptions,
@@ -30,25 +27,16 @@ import {
 } from "@ant-design/pro-components";
 import { UserInfoContext } from "@/context/UserInfoContext";
 import { post, REQUEST_BASE_URL } from "@/common/request";
-import {
-  Form,
-  Input,
-  message,
-  Progress,
-  Image as AntdImage,
-  Upload,
-} from "antd";
+import { Form, Input, message, Progress, Upload } from "antd";
 import { isMatch, isUndefined } from "lodash-es";
 import { CameraOutlined, UploadOutlined } from "@ant-design/icons";
 import styles from "./style.module.less";
 import { beforeUpload } from "../Manage";
 import { FileType, getBase64, getQueryFromUrl, getToken } from "@/utils";
 import { changeUserAvatar, getUserInfo } from "@/api";
-import { PermissionEnum } from "@/common/permission";
 import { MobileContext } from "@/context/MobileContext";
 import { ETab } from "../Lesson";
 const Info = () => {
-  const navigate = useNavigate();
   const { userInfo, setUserInfoContext } = useContext(UserInfoContext);
   const [tabKey, setTabKey] = useState<string>(
     getQueryFromUrl("tab") || ETab.INFO,

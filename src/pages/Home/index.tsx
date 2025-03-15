@@ -19,7 +19,7 @@ import {
 } from "@heroui/react";
 import { Outlet, useNavigate } from "react-router-dom";
 import background from "@/assets/background.png";
-import { useContext, useEffect, useMemo, useState } from "react";
+import { useContext, useState } from "react";
 import { UserInfoContext } from "@/context/UserInfoContext";
 import { DownOutlined } from "@ant-design/icons";
 import { UserInfo } from "@/types";
@@ -28,7 +28,6 @@ import hduLogo from "@/assets/hdulogo.png";
 import legal from "@/assets/官方认证.svg";
 import { setToken } from "@/utils";
 import { REQUEST_BASE_URL } from "@/common/request";
-import { debounce } from "lodash-es";
 import { MobileContext } from "@/context/MobileContext";
 import { ETab } from "../Lesson";
 const RoleTag = (props: {
@@ -311,7 +310,7 @@ const Home = () => {
         )}
       </div>
       <div
-        className="absolute flex justify-center top-[76px]"
+        className="absolute flex justify-center top-[76px] overflow-auto"
         style={{
           height: `calc(100vh - 76px)`,
           width: "100vw",
