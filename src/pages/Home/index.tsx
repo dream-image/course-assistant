@@ -138,7 +138,7 @@ const Home = () => {
 
   return (
     <div
-      className="bg-cover w-full h-full absolute overflow-hidden"
+      className="bg-cover w-full h-full absolute overflow-y-hidden"
       style={{ backgroundImage: `url(${background})` }}
     >
       <div className="fixed top-0 w-full h-[76px] border-b-1 border-blue-50  flex justify-center">
