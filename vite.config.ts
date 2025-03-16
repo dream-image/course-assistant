@@ -2,16 +2,19 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import { visualizer } from "rollup-plugin-visualizer";
 // https://vite.dev/config/
+const VISUALIZER = process.env.VISUALIZER;
 export default defineConfig({
   plugins: [
     react(),
-    visualizer({
-      gzipSize: true,
-      brotliSize: true,
-      emitFile: false,
-      filename: "dist.html", //分析图生成的文件名
-      open: true, //如果存在本地服务端口，将在打包后自动展示
-    }),
+    VISUALIZER
+      ? visualizer({
+          gzipSize: true,
+          brotliSize: true,
+          emitFile: false,
+          filename: "dist.html", //分析图生成的文件名
+          open: true, //如果存在本地服务端口，将在打包后自动展示
+        })
+      : undefined,
   ],
   resolve: {
     alias: {
