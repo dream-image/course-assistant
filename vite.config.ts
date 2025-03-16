@@ -30,6 +30,7 @@ export default defineConfig({
           heroui: ["@heroui/react"],
           lodash: ["lodash-es"],
           highlight: ["highlight.js"],
+          latex: ["katex", "rehype-katex", "remark-math"],
         },
       },
     },
