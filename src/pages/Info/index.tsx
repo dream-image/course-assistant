@@ -391,7 +391,7 @@ const Info = () => {
                       </Form.Item>
                       <ProFormItemRender
                         name="newCover"
-                        label="新封面"
+                        label="新头像"
                         className="h-[200px]"
                       >
                         {({ value, onChange }) => {

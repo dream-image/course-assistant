@@ -27,6 +27,7 @@ const CustomeButtonRadioGroup = (props: Props) => {
     <div style={style} className={className}>
       {list.map((i) => (
         <Tooltip
+          key={i.value}
           title={i.description}
           arrow={false}
           overlayInnerStyle={{

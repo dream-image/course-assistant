@@ -1,10 +1,36 @@
 import { message } from "antd";
 import hljs from "highlight.js";
 import "highlight.js/styles/tokyo-night-dark.min.css";
+import remarkMath from "remark-math";
+import rehypeKatex from "rehype-katex";
+import "katex/dist/katex.min.css"; // 引入 KaTeX 的样式
 import Markdown from "react-markdown";
 import styles from "./style.module.css";
 import { Button } from "antd";
 import { cn } from "@heroui/react";
+// 自动检测并包裹 LaTeX 公式的函数
+function wrapLaTeX(content: string) {
+  // 还原转义字符
+  content = content.replace(/\\\\/g, "\\");
+
+  // 匹配块级公式
+  const blockRegex =
+    /\\begin\{([a-zA-Z0-9*]+)\}([\s\S]*?)\\end\{\1\}|\\\[([\s\S]*?)\\\]|(\$\$[\s\S]*?\$\$)/g;
+
+  // 匹配内联公式
+  const inlineRegex = /\\\(([\s\S]*?)\\\)|\$([^$]+)\$/g;
+
+  // 包裹块级公式
+  content = content.replace(blockRegex, (match) => `$$${match}$$`);
+
+  // 包裹内联公式
+  content = content.replace(inlineRegex, (match, group1, group2) => {
+    const formula = group1 || group2; // 匹配 \(...) 或 $ ... $
+    return `$${formula}$$`;
+  });
+
+  return content;
+}
 const CodeBlock = ({
   className,
   children,
@@ -105,6 +131,8 @@ const MarkdownRenderer = ({
           return (
             <blockquote>
               <Markdown
+                remarkPlugins={[remarkMath]} // 解析 Markdown 中的数学公式
+                rehypePlugins={[rehypeKatex]} // 将数学公式转换为 KaTeX 格式
                 className={cn(
                   styles["markdown-wrapper"],
                   className,
@@ -139,6 +167,8 @@ const MarkdownRenderer = ({
         }
         return (
           <Markdown
+            remarkPlugins={[remarkMath]} // 解析 Markdown 中的数学公式
+            rehypePlugins={[rehypeKatex]} // 将数学公式转换为 KaTeX 格式
             className={cn(
               styles["markdown-wrapper"],
               className,
