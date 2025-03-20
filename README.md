@@ -10,11 +10,18 @@ Currently, two official plugins are available:
 - [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
 # 安装
-pnpm i 
+
+pnpm i
 注意：Taiwindcss在pnpm安装的时候需要额外配置，请自行参考其文档
+
 # 运行
+
 pnpm run dev
+
 # 打包
+
 pnpm run build
+
 # 可视化包体积分析
+
 pnpm run build:visualizer
