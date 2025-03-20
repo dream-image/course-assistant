@@ -10,7 +10,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "commit": "prettier . --check --write &&  eslint src --fix && git add . && git commit && git push",
-    "commit:msg": "git-cz"
+    "commit:msg": "git-cz && git push"
   },
   "dependencies": {
     "@ant-design/icons": "^5.5.1",
