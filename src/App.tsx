@@ -8,8 +8,8 @@ import { message } from "antd";
 import { PageLoading } from "@ant-design/pro-components";
 import { MobileContext } from "./context/MobileContext";
 import { debounce } from "lodash-es";
-import { UserInfoContext } from './context/UserInfoContext';
-import { autoRefreshToken } from '@/utils/autoRefreshToken';
+import { UserInfoContext } from "./context/UserInfoContext";
+import { autoRefreshToken } from "@/utils/autoRefreshToken";
 
 function App() {
   const [userInfo, setUserInfo] = useState<UserInfo>({} as UserInfo);

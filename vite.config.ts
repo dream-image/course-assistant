@@ -16,7 +16,7 @@ export default defineConfig({
         })
       : undefined,
   ],
-  server:{
+  server: {
     port: 3000,
   },
   resolve: {

@@ -18,7 +18,6 @@ request.interceptors.request.use(function (config) {
 });
 request.interceptors.response.use(
   function (response) {
-    
     if (response.status === 404) {
       return Promise.reject(new Error("网络错误，请稍后再试"));
     }
@@ -28,7 +27,7 @@ request.interceptors.response.use(
     return response;
   },
   function (error) {
-    if(error?.message === 'Network Error'){
+    if (error?.message === "Network Error") {
       return Promise.reject(new Error("网络错误，请稍后再试"));
     }
     return Promise.reject(error?.response?.data || error);
