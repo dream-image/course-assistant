@@ -16,6 +16,9 @@ export default defineConfig({
         })
       : undefined,
   ],
+  server:{
+    port: 3000,
+  },
   resolve: {
     alias: {
       "@": "/src",

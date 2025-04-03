@@ -2,15 +2,14 @@ import { Spinner } from "@heroui/react";
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { authRouter, NotAuthRouterList } from "./router";
-import { UserInfoContext } from "./context/UserInfoContext";
 import { UserInfo } from "./types";
 import { getUserInfo } from "./api";
-import { autoRefreshToken } from "./utils/autoRefreshToken";
 import { message } from "antd";
-import { PermissionEnum } from "./common/permission";
 import { PageLoading } from "@ant-design/pro-components";
 import { MobileContext } from "./context/MobileContext";
 import { debounce } from "lodash-es";
+import { UserInfoContext } from './context/UserInfoContext';
+import { autoRefreshToken } from '@/utils/autoRefreshToken';
 
 function App() {
   const [userInfo, setUserInfo] = useState<UserInfo>({} as UserInfo);

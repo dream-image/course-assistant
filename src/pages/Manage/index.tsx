@@ -77,7 +77,7 @@ const Manage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [lessonFiles, setLessonFiles] = useState<LessonFile[]>([]);
   const [lessonUsers, setLessonUsers] = useState<LessonUserType[]>([]);
-  const [accordionWidth, setAccordionWidth] = useState<number>(0);
+  const [accordionWidth, setAccordionWidth] = useState<number | undefined>(undefined);
   const [pageInfo, setPageInfo] = useState({
     total: 0,
     limit: DEFAULT_LIMIT,
@@ -143,7 +143,7 @@ const Manage = () => {
       setLessonFiles(res.data);
     } catch (error: any) {
       message.error(
-        error?.error_msg || error?.message || "获取课程文件列表失败",
+        error?.error_msg || error?.message || "获取课程文件列表失败"
       );
     }
     setIsLoading(false);
@@ -173,7 +173,7 @@ const Manage = () => {
       console.log(res);
     } catch (error: any) {
       message.error(
-        error?.error_msg || error?.message || "获取课程用户列表失败",
+        error?.error_msg || error?.message || "获取课程用户列表失败"
       );
     }
   };
@@ -190,10 +190,12 @@ const Manage = () => {
   };
   useEffect(() => {
     init();
-    setAccordionWidth(
-      Math.ceil(accordionRef?.current?.getBoundingClientRect()?.width || 48) -
-        48,
-    );
+    if (isMobile) {
+      setAccordionWidth(
+        Math.ceil(accordionRef?.current?.getBoundingClientRect()?.width || 48) -
+          48
+      );
+    }
   }, []);
   return (
     <div className=" w-[1680px] h-full flex ml-4 relative">
@@ -252,7 +254,7 @@ const Manage = () => {
                     <div
                       className={cn(
                         "w-full rounded-lg flex items-center justify-between gap-3 ",
-                        isMobile ? "flex-col h-max" : "h-[206px] ",
+                        isMobile ? "flex-col h-max" : "h-[206px] "
                       )}
                       style={{
                         transform:
@@ -349,12 +351,12 @@ const Manage = () => {
                                   validator: (_, value) => {
                                     if (value.length < 1) {
                                       return Promise.reject(
-                                        "昵称长度不得小于1",
+                                        "昵称长度不得小于1"
                                       );
                                     }
                                     if (value.length > 20) {
                                       return Promise.reject(
-                                        "昵称长度不得大于20",
+                                        "昵称长度不得大于20"
                                       );
                                     }
                                     return Promise.resolve();
@@ -462,7 +464,7 @@ const Manage = () => {
                   </AccordionItem>
                   <AccordionItem key="3" aria-label="用户列表" title="用户列表">
                     <div
-                      className={cn(`overflow-auto  no-scrollbar`)}
+                      className={cn(`overflow-auto  no-scrollbar px-2 py-2`)}
                       style={{ width: accordionWidth }}
                     >
                       <StudentShow
@@ -566,7 +568,7 @@ const Manage = () => {
                                     (url) => {
                                       setIsCoverLoading(false);
                                       onChange(url);
-                                    },
+                                    }
                                   );
                                 }
                               }}
@@ -710,7 +712,7 @@ const Manage = () => {
                       beforeUpload={async (file) => {
                         if (
                           uploadFileListInModal.some(
-                            (i) => i.name === file.name,
+                            (i) => i.name === file.name
                           )
                         ) {
                           message.error("文件已在上传列表，请勿重复上传");
