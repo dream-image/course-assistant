@@ -3,6 +3,8 @@ import hljs from "highlight.js";
 import "highlight.js/styles/tokyo-night-dark.min.css";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
+import remarkGfm from 'remark-gfm';// 划线、表、任务列表和直接url等的语法扩展
+import rehypeRaw from 'rehype-raw'// 解析标签，支持html语法
 import "katex/dist/katex.min.css"; // 引入 KaTeX 的样式
 import Markdown from "react-markdown";
 import styles from "./style.module.css";
@@ -109,8 +111,8 @@ const MarkdownRenderer = ({
           return (
             <blockquote>
               <Markdown
-                remarkPlugins={[remarkMath]} // 解析 Markdown 中的数学公式
-                rehypePlugins={[rehypeKatex]} // 将数学公式转换为 KaTeX 格式
+                remarkPlugins={[remarkMath,remarkGfm]} // 解析 Markdown 中的数学公式
+                rehypePlugins={[rehypeKatex,rehypeRaw]} // 将数学公式转换为 KaTeX 格式
                 className={cn(
                   styles["markdown-wrapper"],
                   className,
@@ -145,8 +147,8 @@ const MarkdownRenderer = ({
         }
         return (
           <Markdown
-            remarkPlugins={[remarkMath]} // 解析 Markdown 中的数学公式
-            rehypePlugins={[rehypeKatex]} // 将数学公式转换为 KaTeX 格式
+          remarkPlugins={[remarkMath,remarkGfm]} // 解析 Markdown 中的数学公式
+          rehypePlugins={[rehypeKatex,rehypeRaw]} // 将数学公式转换为 KaTeX 格式
             className={cn(
               styles["markdown-wrapper"],
               className,

@@ -14,6 +14,7 @@ import {
   SyncOutlined,
   UpOutlined,
 } from "@ant-design/icons";
+
 import { getToken } from "@/utils";
 import CustomeButtonRadioGroup from "@/components/Radio";
 import NewChat from "@/components/newChat";
@@ -104,6 +105,7 @@ const ChatAI: React.FC = () => {
           body: JSON.stringify({
             questions: messages,
             lessonId: Number(params.id),
+            lessonName:lesson?.name,
             modelName: modelRef.current,
           }),
         });
