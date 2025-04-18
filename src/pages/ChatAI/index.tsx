@@ -105,7 +105,7 @@ const ChatAI: React.FC = () => {
           body: JSON.stringify({
             questions: messages,
             lessonId: Number(params.id),
-            lessonName:lesson?.name,
+            lessonName: lesson?.name,
             modelName: modelRef.current,
           }),
         });
